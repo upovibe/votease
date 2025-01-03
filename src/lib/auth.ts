@@ -80,7 +80,7 @@ import {
         {
           uid: user.uid,
           email: user.email,
-          name: user.email?.split("@")[0] || "",
+          name: user.displayName ,
           provider: "google",
           photoURL: user.photoURL,
           lastLogin: new Date(),
