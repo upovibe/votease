@@ -29,7 +29,7 @@ import {
     name?: string;
     email?: string;
     provider?: string;
-    photoURL?: string;
+    avatar?: string;
   };
   
   // Function to sign up a new user
@@ -51,7 +51,7 @@ import {
         email: user.email,
         name: user.email ? user.email.split("@")[0] : "",
         provider: "email",
-        photoURL: user.photoURL,
+        avatar: user.photoURL,
         createdAt: new Date(),
       });
   
@@ -82,7 +82,7 @@ import {
           email: user.email,
           name: user.displayName ,
           provider: "google",
-          photoURL: user.photoURL,
+          avatar: user.photoURL,
           lastLogin: new Date(),
         },
         { merge: true }

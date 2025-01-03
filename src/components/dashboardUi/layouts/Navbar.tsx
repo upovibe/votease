@@ -8,7 +8,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 
 const Navbar: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -28,28 +28,26 @@ const Navbar: React.FC = () => {
 
       {/* User Session Display */}
       <div>
-        {loading ? (
-          <span>Loading...</span>
-        ) : user ? (
+        {user ? (
           <div className="flex items-center space-x-4">
             {/* User Photo */}
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white">
               {user.photoURL ? (
-                <Image
-                  src={user.photoURL}
-                  alt="User Avatar"
-                  width={40}
-                  height={40}
-                  style={{ objectFit: 'cover' }}
-                />
+          <Image
+            src={user.avatar || "/default-avatar.png"}
+            alt="User Avatar"
+            width={40}
+            height={40}
+            style={{ objectFit: 'cover' }}
+          />
               ) : (
-                <div className="w-full h-full bg-gray-400 flex items-center justify-center text-white">
-                  {user.displayName?.charAt(0).toUpperCase() || "U"}
-                </div>
+          <div className="w-full h-full bg-gray-400 flex items-center justify-center text-white">
+            {user.name?.charAt(0).toUpperCase() || "U"}
+          </div>
               )}
             </div>
             {/* User Greeting */}
-            <span>Welcome, {user.displayName || user.email}</span>
+            <span>Welcome, {user.name || user.email}</span>
             {/* Logout Button */}
             <button
               onClick={handleLogout}
