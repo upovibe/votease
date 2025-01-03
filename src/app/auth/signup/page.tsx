@@ -15,8 +15,6 @@ const Page = () => {
     setError(""); // Reset any previous errors
 
     try {
-      // Show loading toast while the signup process happens
-      toast.loading("Signing up...");
 
       // Call the signupUser function
       await signupUser(email, password);
@@ -37,7 +35,6 @@ const Page = () => {
   // Handle Google sign-in
   const handleGoogleSignup = async () => {
     try {
-      toast.loading("Signing up with Google...");
       
       await signInWithGoogle();
       toast.success("Google Signup successful!");
