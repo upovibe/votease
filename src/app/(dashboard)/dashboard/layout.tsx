@@ -1,4 +1,4 @@
-import Navbar from "@/components/dashboardUi/layouts/Navbar";
+import Navbar from "@/components/layouts/Navbar";
 import ProtectedRoute from "@/configs/ProtectedRoute";
 
 export default function AuthLayout({
