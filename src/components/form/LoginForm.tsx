@@ -5,6 +5,8 @@ import { Field } from "@/components/ui/field";
 import { useForm } from "react-hook-form";
 import { signinUser, signInWithGoogle } from "@/lib/auth";
 import toast from "react-hot-toast";
+import { Image } from "@chakra-ui/react"
+import googleIcon from "@/public/icons/google.svg"
 
 interface FormValues {
   email: string;
@@ -80,7 +82,7 @@ const LoginForm = () => {
           colorScheme="red"
           width="full"
         >
-          Log In with Google
+          <Image src={googleIcon} alt="Dan Abramov" className="size-5"/>Log In with Google
         </Button>
       </Stack>
     </form>
