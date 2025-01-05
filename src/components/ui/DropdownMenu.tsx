@@ -7,15 +7,18 @@ import { logoutUser } from "@/lib/auth";
 import toast from "react-hot-toast";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const DropdownMenu: React.FC = () => {
   const { user } = useAuth();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     try {
       await logoutUser();
+      router.replace("/");
       toast.success("Logged out successfully!");
     } catch (error) {
       console.error("Error logging out:", error);

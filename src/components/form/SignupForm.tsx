@@ -1,81 +1,103 @@
 "use client";
 
+import { Button, Input, Stack } from "@chakra-ui/react";
+import { Field } from "@/components/ui/field";
+import { useForm } from "react-hook-form";
 import { signupUser, signInWithGoogle } from "@/lib/auth";
-import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
+import { Image } from "@chakra-ui/react";
 
-const SignupForm: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
+interface FormValues {
+  email: string;
+  password: string;
+}
 
-  const handleSignup = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+const SignupForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>();
 
+  // Handle form submission for email/password signup
+  const onSubmit = handleSubmit(async (data) => {
     try {
-      await signupUser(email, password);
+      await signupUser(data.email, data.password);
       toast.success("Signup successful!");
+      // Redirect the user if needed
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-      setError(errorMessage);
-      toast.error(`Error: ${errorMessage}`);
+      if (error instanceof Error) {
+        toast.error(`Error: ${error.message}`);
+      } else {
+        toast.error("An unknown error occurred");
+      }
     }
-  }, [email, password]);
+  });
 
-  const handleGoogleSignup = useCallback(async () => {
+  // Handle Google signup
+  const handleGoogleSignup = async () => {
     try {
       await signInWithGoogle();
       toast.success("Google Signup successful!");
+      // Redirect the user if needed
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-      toast.error(`Error: ${errorMessage}`);
+      if (error instanceof Error) {
+        toast.error(`Error: ${error.message}`);
+      } else {
+        toast.error("An unknown error occurred");
+      }
     }
-  }, []);
+  };
 
   return (
-    <form
-      onSubmit={handleSignup}
-      className="space-y-4 p-6 border rounded-lg shadow-md bg-white"
-    >
-      <h2 className="text-center text-xl font-semibold">Sign Up</h2>
-
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-
-      <button
-        type="submit"
-        className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Sign Up
-      </button>
-
-      <div className="text-center mt-4">OR</div>
-
-      <button
-        type="button"
-        onClick={handleGoogleSignup}
-        className="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600"
-      >
-        Sign Up with Google
-      </button>
+    <form onSubmit={onSubmit}>
+      <Stack className="flex gap-4">
+        <Field
+          label="Email"
+          invalid={!!errors.email}
+          errorText={errors.email?.message}
+        >
+          <Input
+            type="email"
+            {...register("email", { required: "Email is required" })}
+            className="px-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+          />
+        </Field>
+        <Field
+          label="Password"
+          invalid={!!errors.password}
+          errorText={errors.password?.message}
+        >
+          <Input
+            type="password"
+            {...register("password", { required: "Password is required" })}
+            className="px-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+          />
+        </Field>
+        <Button
+          type="submit"
+          colorScheme="blue"
+          width="full"
+          className="bg-blue-600 text-white transition-all duration-300 hover:bg-blue-700"
+        >
+          Sign Up
+        </Button>
+        <div className="flex items-center justify-center gap-4">
+          <div className="w-full bg-black/50 dark:bg-white h-[1px]"></div>
+          <span>OR</span>
+          <div className="w-full bg-black/50 dark:bg-white h-[1px]"></div>
+        </div>
+        <Button
+          type="button"
+          onClick={handleGoogleSignup}
+          colorScheme="red"
+          width="full"
+          className="dark:bg-red-600 dark:text-white hover:text-white transition-all duration-300 hover:bg-red-700 flex items-center justify-center gap-2"
+        >
+          <Image src="/icons/google.png" alt="Google Icon" className="w-5 h-5" />
+          Sign Up with Google
+        </Button>
+      </Stack>
     </form>
   );
 };
