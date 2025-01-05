@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
         <div className="hidden lg:inline-block h-5 w-[1px] bg-gray-300 dark:bg-gray-600"></div>
         {!user && <span className="text-lg font-bold">VotEase</span>}
         {user && (
-          <Link href={"/dashboard"}>
+          <Link href={"/dashboard/polls"}>
             <div className="hidden lg:flex items-center space-x-2">
               <Avatar
                 size="xs"
