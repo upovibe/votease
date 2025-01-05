@@ -6,6 +6,7 @@ import Logo from "@/components/ui/Logo";
 import { Avatar } from "@/components/ui/avatar";
 import DropdownMenu from "@/components/ui/DropdownMenu";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   DialogBackdrop,
   DialogBody,
@@ -30,17 +31,19 @@ const Navbar: React.FC = () => {
         <div className="hidden lg:inline-block h-5 w-[1px] bg-gray-300 dark:bg-gray-600"></div>
         {!user && <span className="text-lg font-bold">VotEase</span>}
         {user && (
-          <div className="hidden lg:flex items-center space-x-2">
-            <Avatar
-              size="xs"
-              name="avatar"
-              src={user?.avatar}
-              className="size-6"
-            />
-            <span className="text-sm font-semibold uppercase">
-              {user?.name}
-            </span>
-          </div>
+          <Link href={"/dashboard"}>
+            <div className="hidden lg:flex items-center space-x-2">
+              <Avatar
+                size="xs"
+                name="avatar"
+                src={user?.avatar}
+                className="size-6"
+              />
+              <span className="text-sm font-semibold uppercase">
+                {user?.name}
+              </span>
+            </div>
+          </Link>
         )}
       </div>
 
@@ -71,7 +74,10 @@ const Navbar: React.FC = () => {
             <DialogRoot placement={"center"}>
               <DialogBackdrop />
               <DialogTrigger asChild>
-                <Button variant="solid" className="px-2 h-8 bg-gray-800 hover:bg-gray-900 text-white">
+                <Button
+                  variant="solid"
+                  className="px-2 h-8 bg-gray-800 hover:bg-gray-900 text-white"
+                >
                   Signup
                 </Button>
               </DialogTrigger>

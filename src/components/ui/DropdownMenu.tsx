@@ -66,16 +66,16 @@ const DropdownMenu: React.FC = () => {
         </div>
         <div className="py-1 space-y-1">
           <Link
-            href="/profile"
+            href="/#"
             className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             Profile
           </Link>
           <Link
-            href="/settings"
+            href="/dashboard"
             className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            Settings
+            Dashboard
           </Link>
           <Button
             onClick={handleLogout}
