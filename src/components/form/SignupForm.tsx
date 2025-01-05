@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { signupUser, signInWithGoogle } from "@/lib/auth";
 import toast from "react-hot-toast";
 import { Image } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 
 interface FormValues {
   email: string;
@@ -18,13 +19,14 @@ const SignupForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>();
+  const router = useRouter();
 
   // Handle form submission for email/password signup
   const onSubmit = handleSubmit(async (data) => {
     try {
       await signupUser(data.email, data.password);
       toast.success("Signup successful!");
-      // Redirect the user if needed
+      router.replace("/dashboard");
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(`Error: ${error.message}`);
@@ -39,7 +41,7 @@ const SignupForm = () => {
     try {
       await signInWithGoogle();
       toast.success("Google Signup successful!");
-      // Redirect the user if needed
+      router.replace("/dashboard");
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(`Error: ${error.message}`);
