@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
   }
 
   return (
-    <nav className="text-gray-800 dark:text-gray-100 p-4 flex justify-between items-center fixed top-0 w-full h-14 backdrop-blur-md">
+    <nav className="text-gray-800 dark:text-gray-100 p-4 flex justify-between items-center fixed top-0 w-full h-14 backdrop-blur-md z-[999]">
       {/* Logo and User Info */}
       <div className="flex items-center space-x-4">
         <Logo />
