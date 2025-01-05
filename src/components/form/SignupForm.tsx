@@ -62,7 +62,7 @@ const SignupForm = () => {
           <Input
             type="email"
             {...register("email", { required: "Email is required" })}
-            className="px-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+            className="px-2 border dark:border-gray-800 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-gray-500/50"
           />
         </Field>
         <Field
@@ -73,7 +73,7 @@ const SignupForm = () => {
           <Input
             type="password"
             {...register("password", { required: "Password is required" })}
-            className="px-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+            className="px-2 border dark:border-gray-800 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-gray-500/50"
           />
         </Field>
         <Button

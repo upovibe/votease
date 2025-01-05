@@ -65,17 +65,23 @@ const DropdownMenu: React.FC = () => {
           <div className="w-full h-px my-2 bg-gray-200 dark:bg-gray-700" />
         </div>
         <div className="py-1 space-y-1">
+        <Link
+            href="/dashboard"
+            className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/dashboard/polls/new"
+            className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            New polls
+          </Link>
           <Link
             href="/#"
             className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             Profile
-          </Link>
-          <Link
-            href="/dashboard"
-            className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
-            Dashboard
           </Link>
           <Button
             onClick={handleLogout}

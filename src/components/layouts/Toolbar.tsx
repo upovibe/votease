@@ -10,6 +10,17 @@ import {
   SelectValueText,
 } from "@/components/ui/select";
 import { createListCollection } from "@chakra-ui/react";
+import {
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import CreatePoll from "@/components/form/CreatePoll";
+
 
 const Toolbar = () => {
   const items = [
@@ -18,6 +29,7 @@ const Toolbar = () => {
   ];
 
   const collection = createListCollection({ items });
+
 
   return (
     <div className="container flex gap-2 items-center mx-auto">
@@ -47,11 +59,25 @@ const Toolbar = () => {
           ))}
         </SelectContent>
       </SelectRoot>
-      <Button className="px-2 h-9 bg-gray-200 dark:bg-gray-700 text-black dark:text-white transition-all duration-300 ">
-        {" "}
+      <DialogRoot scrollBehavior="inside" size="sm">
+      <DialogTrigger asChild>
+      <Button
+        className="px-2 h-9 bg-gray-200 dark:bg-gray-700 text-black dark:text-white transition-all duration-300"
+      >
         <Plus />
         <span className="hidden lg:inline-block"> Add new poll</span>
       </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-3xl font-bold mb-6 text-center">Create a Poll</DialogTitle>
+        </DialogHeader>
+        <DialogCloseTrigger />
+        <DialogBody>
+          <CreatePoll/>
+        </DialogBody>
+      </DialogContent>
+    </DialogRoot>
     </div>
   );
 };

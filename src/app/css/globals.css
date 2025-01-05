@@ -19,3 +19,37 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* Light Theme */
+.rdtPicker {
+  background-color: white;
+  color: black;
+  border: 1px solid #e2e8f0; /* Tailwind's gray-200 */
+  width: 100%;
+}
+
+.rdtPicker .rdtDays td {
+  color: black;
+}
+
+.rdtPicker .rdtDays td.rdtActive {
+  background-color: #3b82f6; /* Tailwind's blue-500 */
+  color: white;
+}
+
+/* Dark Theme */
+.dark .rdtPicker {
+  background-color: #1a202c; /* Tailwind's gray-900 */
+  color: white;
+  border: 1px solid #2d3748; /* Tailwind's gray-800 */
+}
+
+.dark .rdtPicker .rdtDays td {
+  color: white;
+}
+
+.dark .rdtPicker .rdtDays td.rdtActive {
+  background-color: #2563eb; /* Tailwind's blue-600 */
+  color: white;
+}
