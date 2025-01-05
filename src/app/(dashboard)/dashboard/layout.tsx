@@ -7,7 +7,7 @@ export default function AuthLayout({
   return (
     <AuthProtect>
       <Navbar />
-      <main>{children}</main>
+      <main className="mt-14">{children}</main>
     </AuthProtect>
   );
 }

@@ -4,14 +4,14 @@ import LoadingAnimation from "@/public/animations/LoadingApp.json";
 
 const Loading = () => {
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center h-screen">
       <Lottie
         animationData={LoadingAnimation}
         loop={true}
-        className="size-20"
+        className="size-32"
       />
     </div>
   );
 }
 
-export { Loading };
+export default Loading;

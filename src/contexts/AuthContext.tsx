@@ -17,10 +17,11 @@ interface User extends FirebaseUser {
 // Context value type
 interface AuthContextValue {
   user: User | null;
+  loading: boolean;
 }
 
 // Create the AuthContext to store user info
-const AuthContext = createContext<AuthContextValue>({ user: null });
+const AuthContext = createContext<AuthContextValue>({ user: null, loading: true });
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -30,6 +31,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -45,11 +47,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             setUser(firebaseUser as User);
           }
+          setLoading(false);
         });
 
         return () => unsubscribeFromUserDoc();
       } else {
         setUser(null);
+        setLoading(false);
       }
     });
 
@@ -57,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
   );
