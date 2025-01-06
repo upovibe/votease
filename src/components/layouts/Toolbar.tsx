@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import CreatePoll from "@/components/form/CreatePoll";
 
-const Toolbar = () => {
+const Toolbar = ({ setSearchQuery }) => {
   const items = [
     { label: "Option 1", value: "option-1" },
     { label: "Option 2", value: "option-2" },
@@ -37,10 +37,12 @@ const Toolbar = () => {
         endElement={<Kbd>⌘K</Kbd>}
       >
         <Input
-          placeholder="Search contacts"
+          placeholder="Search polls by title or statement"
           className="border dark:border-gray-800 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </InputGroup>
+
       <SelectRoot
         collection={collection}
         size="sm"

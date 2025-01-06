@@ -10,6 +10,7 @@ import {
   where,
   getDocs,
   addDoc,
+  serverTimestamp,
   // DocumentData,
   // Query,
   // CollectionReference,
@@ -18,6 +19,7 @@ import {
 interface Poll {
   id: string;
   title: string;
+  statement?: string;
   options: string[];
   startDate: Date;
   endDate: Date;
@@ -25,7 +27,10 @@ interface Poll {
   createdAt: Date;
   status: string;
   flagged: boolean;
+  creatorName?: string;
+  creatorAvatar?: string;
 }
+
 
 interface User {
   role: string;
@@ -74,7 +79,7 @@ export const createPoll = async (
         creatorId: userId,
         creatorName: userData.name,
         creatorAvatar: userData.avatar,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
         status: "active",
         flagged: false,
       });
