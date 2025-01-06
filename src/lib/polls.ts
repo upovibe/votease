@@ -10,9 +10,9 @@ import {
   where,
   getDocs,
   addDoc,
-  DocumentData,
-  Query,
-  CollectionReference,
+  // DocumentData,
+  // Query,
+  // CollectionReference,
 } from "firebase/firestore";
 
 interface Poll {
@@ -49,11 +49,19 @@ export const isAdmin = async (userId: string): Promise<boolean> => {
 // Function to create a poll (default: active, but flagged can override visibility)
 export const createPoll = async (
   userId: string,
-  pollData: { title: string; statement: string; options: string[]; startDate: Date; endDate: Date }
+  pollData: {
+    title: string;
+    statement: string;
+    options: string[];
+    startDate: Date;
+    endDate: Date;
+  }
 ): Promise<void> => {
   try {
     if (!pollData?.title || !pollData?.options?.length) {
-      throw new Error("Invalid poll data. Ensure title, options, startDate, and endDate are provided.");
+      throw new Error(
+        "Invalid poll data. Ensure title, options, startDate, and endDate are provided."
+      );
     }
 
     const userDocRef = doc(db, "users", userId);
@@ -106,7 +114,10 @@ export const editPoll = async (
 };
 
 // Function to delete a poll
-export const deletePoll = async (userId: string, pollId: string): Promise<void> => {
+export const deletePoll = async (
+  userId: string,
+  pollId: string
+): Promise<void> => {
   try {
     const pollDocRef = doc(db, "polls", pollId);
     const pollDoc = await getDoc(pollDocRef);
@@ -127,42 +138,33 @@ export const deletePoll = async (userId: string, pollId: string): Promise<void> 
   }
 };
 
-// Function to view polls (with optional filters and proper typing)
-export const viewPolls = async (filter: { 
-  status?: string; 
-  flagged?: boolean; 
-  creatorId?: string 
-} = {}): Promise<Poll[]> => {
+// Function to fetch polls with optional filters
+export const viewPolls = async (
+  filter: Partial<Pick<Poll, "status" | "flagged" | "creatorId">> = {}
+): Promise<Poll[]> => {
   try {
-    const pollsQuery = collection(db, "polls");
-    const conditions = [];
-    
-    if (filter.status) {
-      conditions.push(where("status", "==", filter.status));
-    }
-    if (filter.flagged !== undefined) {
-      conditions.push(where("flagged", "==", filter.flagged));
-    }
-    if (filter.creatorId) {
-      conditions.push(where("creatorId", "==", filter.creatorId));
-    }
+    const pollsRef = collection(db, "polls");
+    const queryConditions = Object.entries(filter).map(([field, value]) =>
+      where(field, "==", value)
+    );
+    const pollsQuery = queryConditions.length
+      ? query(pollsRef, ...queryConditions)
+      : pollsRef;
 
-    const finalQuery = conditions.length > 0 ? query(pollsQuery, ...conditions) : pollsQuery;
-    const querySnapshot = await getDocs(finalQuery);
-
-    const polls = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Poll));
-    console.log("Fetched polls from Firestore:", polls); // Debugging
-    return polls;
+    const snapshot = await getDocs(pollsQuery);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Poll));
   } catch (error) {
     console.error("Error fetching polls:", error);
-    throw error;
+    throw new Error("Unable to fetch polls.");
   }
 };
 
-
-
 // Function to flag a poll as inappropriate (admin only)
-export const flagPoll = async (userId: string, pollId: string, flagType: "active" | "flagged"): Promise<void> => {
+export const flagPoll = async (
+  userId: string,
+  pollId: string,
+  flagType: "active" | "flagged"
+): Promise<void> => {
   try {
     if (await isAdmin(userId)) {
       const pollDocRef = doc(db, "polls", pollId);
