@@ -81,7 +81,12 @@ const DropdownMenu: React.FC = () => {
           >
             Dashboard
           </Link>
-
+          <Link
+            href="/dashboard/polls"
+            className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+          >
+            Polls
+          </Link>
           <DialogRoot scrollBehavior="inside" size="sm">
             <DialogTrigger asChild>
               <Link

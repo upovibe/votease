@@ -1,8 +1,11 @@
+import PollsList from '@/components/pollsUi/PollsList'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>Polls page</div>
+    <div>
+      <PollsList/>
+    </div>
   )
 }
 

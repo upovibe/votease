@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Stack, Box } from "@chakra-ui/react";
+import { Button, Input, Stack, Box, Textarea} from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import { useForm, useFieldArray } from "react-hook-form";
 import { createPoll } from "@/lib/polls";
@@ -15,6 +15,7 @@ import moment from "moment";
 
 interface FormValues {
   title: string;
+  statement: string;
   options: { value: string }[];
   startDate: Date | string;
   endDate: Date | string;
@@ -58,6 +59,7 @@ const CreatePoll: React.FC = () => {
     try {
       await createPoll(user.uid, {
         title: data.title,
+        statement: data.statement,
         options: data.options.map((opt) => opt.value),
         startDate: new Date(data.startDate),
         endDate: new Date(data.endDate),
@@ -94,6 +96,17 @@ const CreatePoll: React.FC = () => {
         <Input
           placeholder="Enter poll title"
           {...register("title", { required: "Poll title is required" })}
+          className="px-2 border dark:border-gray-800 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-gray-500/50"
+        />
+      </Field>
+      <Field
+        label="Poll Title"
+        invalid={!!errors.statement}
+        errorText={errors.statement?.message}
+      >
+        <Textarea
+          placeholder="Enter poll statement"
+          {...register("statement", { required: "Poll statement is required" })}
           className="px-2 border dark:border-gray-800 text-black dark:text-white transition-all duration-300 focus:ring-2 focus:ring-gray-500/50"
         />
       </Field>
