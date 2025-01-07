@@ -31,7 +31,6 @@ interface Poll {
   creatorAvatar?: string;
 }
 
-
 interface User {
   role: string;
 }
