@@ -68,7 +68,7 @@ const DropdownMenu: React.FC = () => {
         style={{ transformOrigin: "top right" }}
       >
         <div className="flex items-start flex-col">
-          <div className="text-black dark:text-white">{user?.name}</div>
+          <div className="text-black dark:text-white">{user?.displayName}</div>
           <span className="text-gray-600 dark:text-gray-400">
             {user?.email}
           </span>
@@ -85,7 +85,7 @@ const DropdownMenu: React.FC = () => {
             href="/dashboard/polls"
             className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            Polls
+            My polls
           </Link>
           <DialogRoot scrollBehavior="inside" size="sm">
             <DialogTrigger asChild>
