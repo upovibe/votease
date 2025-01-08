@@ -7,7 +7,8 @@ import {
   where,
   getDocs,
   addDoc,
-  // serverTimestamp,
+  serverTimestamp,
+  FieldValue,
   // doc,
   // getDoc,
   // updateDoc,
@@ -21,10 +22,10 @@ interface Vote {
   pollId: string;
   option: string;
   userId: string;
-  createdAt: Date;
+  createdAt: FieldValue;
 }
 
-// Funtiom to casts a vote for a poll.
+// Function to cast a vote for a poll
 export const castVote = async (
   userId: string,
   pollId: string,
@@ -47,7 +48,7 @@ export const castVote = async (
       pollId,
       option,
       userId,
-      createdAt: new Date(),
+      createdAt: serverTimestamp(),
     };
 
     // Add the vote data to Firestore
@@ -58,7 +59,7 @@ export const castVote = async (
   }
 };
 
-// Funtiom to Undoes a vote for a poll.
+// Function to undo a vote for a poll
 export const undoVote = async (
   userId: string,
   pollId: string
@@ -83,7 +84,7 @@ export const undoVote = async (
   }
 };
 
-// Function to Retrieves the vote count for a poll.
+// Function to retrieve the vote count for a poll
 export const getVoteCount = async (
   pollId: string
 ): Promise<{ [option: string]: number }> => {
@@ -110,7 +111,7 @@ export const getVoteCount = async (
   }
 };
 
-// Function to Retrieves the total vote count for a poll.
+// Function to retrieve the total vote count for a poll
 export const getTotalVoteCount = async (pollId: string): Promise<number> => {
   try {
     const voteCount = await getVoteCount(pollId);
