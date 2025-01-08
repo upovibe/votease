@@ -44,8 +44,8 @@ const Navbar: React.FC = () => {
                 src={user?.avatar}
                 className="size-6"
               />
-              <span className="text-sm font-semibold uppercase">
-                {user?.name}
+              <span className="text-sm font-semibold capitalize">
+                {user?.name || user?.displayName}&apos;s <span className="lowercase">polls</span>
               </span>
             </div>
           </Link>
