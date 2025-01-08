@@ -38,7 +38,11 @@ interface PollData {
   endDate: Date;
 }
 
-const PollsList = () => {
+interface PollsListProps {
+  filterByCreator?: boolean; // If true, show only the logged-in user's polls
+}
+
+const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
   const { user, loading } = useAuth();
   const [polls, setPolls] = useState<Poll[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -47,40 +51,44 @@ const PollsList = () => {
   const [pollLoading, setPollLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.uid) {
-      const fetchPolls = async () => {
-        try {
-          setPollLoading(true);
-          const fetchedPolls = await viewPolls({ creatorId: user.uid });
-          setPolls(
-            fetchedPolls.map((poll) => ({
-              ...poll,
-              statement: poll.statement ?? "",
-            }))
-          );
-        } catch (error) {
-          setError(
-            error instanceof Error
-              ? `Error fetching polls: ${error.message}`
-              : "An unknown error occurred"
-          );
-        } finally {
-          setPollLoading(false);
-        }
-      };
+    const fetchPolls = async () => {
+      if (!user?.uid) return;
 
-      const checkAdminStatus = async () => {
+      try {
+        setPollLoading(true);
+        const fetchedPolls = await viewPolls({
+          creatorId: filterByCreator ? user.uid : undefined, // Fetch polls based on the filter
+        });
+        setPolls(
+          fetchedPolls.map((poll) => ({
+            ...poll,
+            statement: poll.statement ?? "",
+          }))
+        );
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? `Error fetching polls: ${error.message}`
+            : "An unknown error occurred"
+        );
+      } finally {
+        setPollLoading(false);
+      }
+    };
+
+    const checkAdminStatus = async () => {
+      if (user?.uid) {
         const adminStatus = await isAdmin(user.uid);
         setIsAdminUser(adminStatus);
-      };
+      }
+    };
 
-      fetchPolls();
-      checkAdminStatus();
-    }
-  }, [user?.uid]);
+    fetchPolls();
+    checkAdminStatus();
+  }, [user?.uid, filterByCreator]);
 
   const handleDelete = async (pollId: string) => {
-    if (!user?.uid) return; // Ensure user is logged in
+    if (!user?.uid) return;
 
     try {
       await deletePoll(user.uid, pollId);
@@ -93,7 +101,7 @@ const PollsList = () => {
   };
 
   const handleFlagToggle = async (pollId: string) => {
-    if (!user?.uid) return; // Ensure user is logged in
+    if (!user?.uid) return;
 
     try {
       const poll = polls.find((p) => p.id === pollId);
@@ -134,7 +142,7 @@ const PollsList = () => {
   }
 
   if (!user) {
-    return <div>Please log in to view your polls.</div>;
+    return <div>Please log in to view polls.</div>;
   }
 
   if (error) {
@@ -145,7 +153,7 @@ const PollsList = () => {
     <div className="p-4 space-y-5">
       {polls.length > 0 && <Toolbar setSearchQuery={setSearchQuery} />}
       {polls.length === 0 && <FirstPollCTA />}
-      
+
       {filteredPolls.length > 0 ? (
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPolls.map((poll) => (

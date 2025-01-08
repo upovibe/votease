@@ -148,9 +148,15 @@ export const viewPolls = async (
 ): Promise<Poll[]> => {
   try {
     const pollsRef = collection(db, "polls");
-    const queryConditions = Object.entries(filter).map(([field, value]) =>
+
+    const validFilters = Object.entries(filter).filter(
+      ([, value]) => value !== undefined 
+    );
+
+    const queryConditions = validFilters.map(([field, value]) =>
       where(field, "==", value)
     );
+
     const pollsQuery = queryConditions.length
       ? query(pollsRef, ...queryConditions)
       : pollsRef;
@@ -163,6 +169,8 @@ export const viewPolls = async (
   }
 };
 
+
+
 // Function to flag a poll as inappropriate (admin only)
 export const flagPoll = async (
   userId: string,
@@ -173,9 +181,9 @@ export const flagPoll = async (
     if (await isAdmin(userId)) {
       const pollDocRef = doc(db, "polls", pollId);
       if (flagType === "flagged") {
-        await updateDoc(pollDocRef, { flagged: true, status: "inactive" }); // Mark as flagged and inactive
+        await updateDoc(pollDocRef, { flagged: true, status: "inactive" });
       } else if (flagType === "active") {
-        await updateDoc(pollDocRef, { status: "active", flagged: false }); // Approve and unflag
+        await updateDoc(pollDocRef, { status: "active", flagged: false });
       } else {
         throw new Error("Invalid flag type.");
       }
