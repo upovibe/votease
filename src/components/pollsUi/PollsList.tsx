@@ -7,7 +7,12 @@ import { Flag, FlagOff, CheckCheck, X, Vote } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatDate } from "@/utils/dateUtils";
 import Link from "next/link";
-import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "@/components/ui/menu";
+import {
+  MenuContent,
+  MenuItem,
+  MenuRoot,
+  MenuTrigger,
+} from "@/components/ui/menu";
 import { EllipsisVertical } from "lucide-react";
 import DeletePollDialog from "@/components/layouts/DeletePollDialog";
 import FlagPollDialog from "@/components/layouts/FlagPollDialog";
@@ -115,7 +120,11 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
               : poll
           )
         );
-        toast.success(poll.flagged ? "Poll unflagged successfully." : "Poll flagged successfully.");
+        toast.success(
+          poll.flagged
+            ? "Poll unflagged successfully."
+            : "Poll flagged successfully."
+        );
       }
     } catch (error) {
       console.error("Error flagging/unflagging poll:", error);
@@ -152,9 +161,10 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
   return (
     <div className="p-4 space-y-5">
       {polls.length > 0 && <Toolbar setSearchQuery={setSearchQuery} />}
-      {polls.length === 0 && <FirstPollCTA />}
 
-      {filteredPolls.length > 0 ? (
+      {polls.length === 0 ? (
+        <FirstPollCTA />
+      ) : filteredPolls.length > 0 ? (
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPolls.map((poll) => (
             <div
@@ -188,10 +198,16 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
                         </MenuItem>
                       )}
                       <MenuItem value="edit">
-                        <EditPollDialog pollId={poll.id} currentData={mapPollToPollData(poll)} />
+                        <EditPollDialog
+                          pollId={poll.id}
+                          currentData={mapPollToPollData(poll)}
+                        />
                       </MenuItem>
                       <MenuItem value="delete">
-                        <DeletePollDialog pollId={poll.id} onDelete={handleDelete} />
+                        <DeletePollDialog
+                          pollId={poll.id}
+                          onDelete={handleDelete}
+                        />
                       </MenuItem>
                     </MenuContent>
                   </MenuRoot>
@@ -203,56 +219,59 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
                   {poll.title}
                 </h3>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 <Link
                   href="/dashboard/polls/slug"
                   className="text-gray-600 dark:text-gray-200 hover:underline"
                 >
                   {poll.statement}
                 </Link>
-                <strong> {formatDate(poll.createdAt)}</strong>
-              </p>
-              <div className="flex items-center justify-between">
-                <span
-                  className={`text-sm font-medium ${
-                    poll.status === "active"
-                      ? "text-green-500 dark:text-green-400"
-                      : "text-red-500 dark:text-red-400"
-                  }`}
-                >
-                  {poll.status === "active" ? (
-                    <>
-                      <CheckCheck size={16} className="inline-block mr-1" />
-                      Active
-                    </>
-                  ) : (
-                    <>
-                      <X size={16} className="inline-block mr-1" />
-                      Inactive
-                    </>
-                  )}
-                </span>
-                <span
-                  className={`text-sm ${
-                    poll.flagged
-                      ? "text-red-500 dark:text-red-400"
-                      : "text-gray-400 dark:text-gray-500"
-                  }`}
-                >
-                  {poll.flagged ? (
-                    <Flag size={16} className="inline-block" />
-                  ) : (
-                    <FlagOff size={16} className="inline-block" />
-                  )}
-                </span>
+                <br />
+                <div className="flex items-center justify-between">
+                  <p className="space-x-1">
+                    <strong> {formatDate(poll.createdAt)}</strong>
+                    <span
+                      className={`text-sm font-medium ${
+                        poll.status === "active"
+                          ? "text-green-500 dark:text-green-400"
+                          : "text-red-500 dark:text-red-400"
+                      }`}
+                    >
+                      {poll.status === "active" ? (
+                        <>
+                          <CheckCheck size={16} className="inline-block mr-1" />
+                          Active
+                        </>
+                      ) : (
+                        <>
+                          <X size={16} className="inline-block mr-1" />
+                          Inactive
+                        </>
+                      )}
+                    </span>
+                  </p>
+                  <span
+                    className={`text-sm ${
+                      poll.flagged
+                        ? "text-red-500 dark:text-red-400"
+                        : "text-gray-400 dark:text-gray-500"
+                    }`}
+                  >
+                    {poll.flagged ? (
+                      <Flag size={16} className="inline-block" />
+                    ) : (
+                      <FlagOff size={16} className="inline-block" />
+                    )}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        filteredPolls.length === 0 && (
-          <p className="text-gray-500 dark:text-gray-400 text-center">No polls match your search criteria.</p>
-        )
+        <p className="text-gray-500 dark:text-gray-400 text-center">
+          No polls match your search criteria.
+        </p>
       )}
     </div>
   );
