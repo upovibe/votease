@@ -6,8 +6,8 @@ import { viewPolls } from "@/lib/polls";
 import Loading from "@/components/ui/Loading";
 import { formatDate } from "@/utils/dateUtils";
 import { Avatar } from "@/components/ui/avatar";
-import Link from "next/link";
-import { CheckCheck, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { CheckCheck, View, X } from "lucide-react";
 
 interface Poll {
   id: string;
@@ -27,6 +27,7 @@ interface Poll {
 }
 
 const PollDetails: React.FC = () => {
+  const router = useRouter();
   const { slug } = useParams();
   const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,12 +85,7 @@ const PollDetails: React.FC = () => {
             {poll.creatorName}
           </span>
         </div>
-        <Link
-          href={"#"}
-          className=" bg-gray-200 dark:bg-gray-700 text-black dark:text-white transition-all duration-300 h-9 px-3 leading-[2.25rem] hover:shadow rounded-md"
-        >
-          Visit profile
-        </Link>
+        <View className="cursor-pointer" />
       </div>
       <div className="bg-gradient-to-r from-transparent via-gray-900 to-transparent dark:via-gray-500 h-[1px] w-full my-5 "></div>
       <div className="flex flex-col gap-3">
