@@ -15,7 +15,7 @@ import EditPollDialog from "@/components/layouts/EditPollDialog";
 import Toolbar from "@/components/layouts/Toolbar";
 import FirstPollCTA from "@/components/layouts/FirstPollCTA";
 import Loading from "@/components/ui/Loading";
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Poll {
   id: string;
@@ -44,11 +44,13 @@ const PollsList = () => {
   const [error, setError] = useState<string | null>(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [pollLoading, setPollLoading] = useState(true);
 
   useEffect(() => {
     if (user?.uid) {
       const fetchPolls = async () => {
         try {
+          setPollLoading(true);
           const fetchedPolls = await viewPolls({ creatorId: user.uid });
           setPolls(
             fetchedPolls.map((poll) => ({
@@ -62,6 +64,8 @@ const PollsList = () => {
               ? `Error fetching polls: ${error.message}`
               : "An unknown error occurred"
           );
+        } finally {
+          setPollLoading(false);
         }
       };
 
@@ -125,7 +129,7 @@ const PollsList = () => {
       poll.statement.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
+  if (loading || pollLoading) {
     return <Loading />;
   }
 
@@ -139,7 +143,9 @@ const PollsList = () => {
 
   return (
     <div className="p-4 space-y-5">
-      <Toolbar setSearchQuery={setSearchQuery} />
+      {polls.length > 0 && <Toolbar setSearchQuery={setSearchQuery} />}
+      {polls.length === 0 && <FirstPollCTA />}
+      
       {filteredPolls.length > 0 ? (
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPolls.map((poll) => (
@@ -236,10 +242,8 @@ const PollsList = () => {
           ))}
         </div>
       ) : (
-        filteredPolls.length === 0 && searchQuery ? (
-          <p>No results found.</p>
-        ) : (
-          polls.length === 0 && <FirstPollCTA />
+        filteredPolls.length === 0 && (
+          <p className="text-gray-500 dark:text-gray-400 text-center">No polls match your search criteria.</p>
         )
       )}
     </div>
