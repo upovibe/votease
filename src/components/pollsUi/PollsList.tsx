@@ -7,6 +7,7 @@ import { Flag, FlagOff, CheckCheck, X, Vote } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatDate } from "@/utils/dateUtils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   MenuContent,
   MenuItem,
@@ -25,6 +26,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Poll {
   id: string;
   title: string;
+  slug?: string;
   statement: string;
   options: string[];
   creatorId: string;
@@ -44,10 +46,11 @@ interface PollData {
 }
 
 interface PollsListProps {
-  filterByCreator?: boolean; // If true, show only the logged-in user's polls
+  filterByCreator?: boolean;
 }
 
 const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
+  const router = useRouter();
   const { user, loading } = useAuth();
   const [polls, setPolls] = useState<Poll[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -158,6 +161,16 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
     return <div>Error: {error}</div>;
   }
 
+  // Handle navigation
+  const handleViewPoll = (poll: Poll) => {
+    if (poll.slug) {
+      router.push(`/dashboard/polls/${poll.slug}`);
+    } else {
+      console.error("Poll slug is missing.");
+    }
+  };
+  
+
   return (
     <div className="p-4 space-y-5">
       {polls.length > 0 && <Toolbar setSearchQuery={setSearchQuery} />}
@@ -169,6 +182,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
           {filteredPolls.map((poll) => (
             <div
               key={poll.id}
+              onClick={() => handleViewPoll(poll)} 
               className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear"
             >
               <div className="flex items-center w-full justify-between gap-2">
