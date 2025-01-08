@@ -15,6 +15,7 @@ import EditPollDialog from "@/components/layouts/EditPollDialog";
 import Toolbar from "@/components/layouts/Toolbar";
 import FirstPollCTA from "@/components/layouts/FirstPollCTA";
 import Loading from "@/components/ui/Loading";
+import { useAuth } from "@/contexts/AuthContext"
 
 interface Poll {
   id: string;
@@ -38,49 +39,47 @@ interface PollData {
 }
 
 const PollsList = () => {
+  const { user, loading } = useAuth();
   const [polls, setPolls] = useState<Poll[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [currentUserId] = useState<string>("5nAhIg1OJCWT6xrvPgHfkeJ3tLr1");
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Track loading state
 
   useEffect(() => {
-    // Simulate loading delay
-    const timeout = setTimeout(() => setIsLoading(false), 2000); // 2 seconds delay
-    
-    const fetchPolls = async () => {
-      try {
-        const fetchedPolls = await viewPolls({ creatorId: currentUserId });
-        setPolls(
-          fetchedPolls.map((poll) => ({
-            ...poll,
-            statement: poll.statement ?? "",
-          }))
-        );
-      } catch (error) {
-        setError(
-          error instanceof Error
-            ? `Error fetching polls: ${error.message}`
-            : "An unknown error occurred"
-        );
-      }
-    };
+    if (user?.uid) {
+      const fetchPolls = async () => {
+        try {
+          const fetchedPolls = await viewPolls({ creatorId: user.uid });
+          setPolls(
+            fetchedPolls.map((poll) => ({
+              ...poll,
+              statement: poll.statement ?? "",
+            }))
+          );
+        } catch (error) {
+          setError(
+            error instanceof Error
+              ? `Error fetching polls: ${error.message}`
+              : "An unknown error occurred"
+          );
+        }
+      };
 
-    const checkAdminStatus = async () => {
-      const adminStatus = await isAdmin(currentUserId);
-      setIsAdminUser(adminStatus);
-    };
+      const checkAdminStatus = async () => {
+        const adminStatus = await isAdmin(user.uid);
+        setIsAdminUser(adminStatus);
+      };
 
-    fetchPolls();
-    checkAdminStatus();
-
-    return () => clearTimeout(timeout); // Clear timeout if the component unmounts
-  }, [currentUserId]);
+      fetchPolls();
+      checkAdminStatus();
+    }
+  }, [user?.uid]);
 
   const handleDelete = async (pollId: string) => {
+    if (!user?.uid) return; // Ensure user is logged in
+
     try {
-      await deletePoll(currentUserId, pollId);
+      await deletePoll(user.uid, pollId);
       setPolls((prevPolls) => prevPolls.filter((poll) => poll.id !== pollId));
       toast.success("Poll deleted successfully.");
     } catch (error) {
@@ -90,12 +89,13 @@ const PollsList = () => {
   };
 
   const handleFlagToggle = async (pollId: string) => {
+    if (!user?.uid) return; // Ensure user is logged in
+
     try {
       const poll = polls.find((p) => p.id === pollId);
       if (poll) {
         const newStatus = poll.flagged ? "active" : "flagged";
-        
-        await flagPoll(currentUserId, pollId, newStatus);
+        await flagPoll(user.uid, pollId, newStatus);
         setPolls((prevPolls) =>
           prevPolls.map((poll) =>
             poll.id === pollId
@@ -125,12 +125,16 @@ const PollsList = () => {
       poll.statement.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (error) {
-    return <div>Error: {error}</div>;
+  if (loading) {
+    return <Loading />;
   }
 
-  if (isLoading) {
-    return <Loading />;
+  if (!user) {
+    return <div>Please log in to view your polls.</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
@@ -154,34 +158,27 @@ const PollsList = () => {
                     {poll.creatorName || "Unknown Creator"}
                   </span>
                 </div>
-                
-                {/* Show the menu only if the user is the creator or an admin */}
-                {(isAdminUser || poll.creatorId === currentUserId) && (
+                {(isAdminUser || poll.creatorId === user.uid) && (
                   <MenuRoot>
                     <MenuTrigger asChild>
                       <EllipsisVertical />
                     </MenuTrigger>
-                    <MenuContent className="">
+                    <MenuContent>
                       {isAdminUser && (
                         <MenuItem value="flag">
                           <FlagPollDialog
                             pollId={poll.id}
                             flagged={poll.flagged}
-                            onFlagToggle={handleFlagToggle} // Updated
+                            onFlagToggle={handleFlagToggle}
                           />
                         </MenuItem>
                       )}
-                      {/* Show Edit Poll only for admin or creator */}
-                      {(isAdminUser || poll.creatorId === currentUserId) && (
-                        <MenuItem value="edit">
-                          <EditPollDialog pollId={poll.id} currentData={mapPollToPollData(poll)} />
-                        </MenuItem>
-                      )}
-                      {(isAdminUser || poll.creatorId === currentUserId) && (
-                        <MenuItem value="delete">
-                          <DeletePollDialog pollId={poll.id} onDelete={handleDelete} />
-                        </MenuItem>
-                      )}
+                      <MenuItem value="edit">
+                        <EditPollDialog pollId={poll.id} currentData={mapPollToPollData(poll)} />
+                      </MenuItem>
+                      <MenuItem value="delete">
+                        <DeletePollDialog pollId={poll.id} onDelete={handleDelete} />
+                      </MenuItem>
                     </MenuContent>
                   </MenuRoot>
                 )}
@@ -192,7 +189,6 @@ const PollsList = () => {
                   {poll.title}
                 </h3>
               </div>
-
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 <Link
                   href="/dashboard/polls/slug"

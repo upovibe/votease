@@ -4,8 +4,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
+import Loading from "@/components/ui/Loading";
 
-// Extended User type to include custom Firestore fields
 interface User extends FirebaseUser {
   name?: string;
   avatar?: string;
@@ -59,6 +59,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading }}>
