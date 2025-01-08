@@ -156,7 +156,7 @@ export const deletePoll = async (
 
 // Function to fetch polls with optional filters
 export const viewPolls = async (
-  filter: Partial<Pick<Poll, "status" | "flagged" | "creatorId">> = {}
+  filter: Partial<Pick<Poll, "status" | "flagged" | "creatorId" | "slug">> = {}
 ): Promise<Poll[]> => {
   try {
     const pollsRef = collection(db, "polls");

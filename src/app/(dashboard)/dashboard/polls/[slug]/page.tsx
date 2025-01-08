@@ -1,8 +1,11 @@
 import React from 'react'
+import PollDetails from '@/components/pollsUi/PollDetails'
 
 const page = () => {
   return (
-    <div>page</div>
+    <div>
+      <PollDetails />
+    </div>
   )
 }
 
