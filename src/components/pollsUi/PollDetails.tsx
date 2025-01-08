@@ -1,13 +1,24 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { viewPolls } from "@/lib/polls";
+import { useParams, useRouter } from "next/navigation";
+import { viewPolls, deletePoll, flagPoll, isAdmin } from "@/lib/polls";
 import Loading from "@/components/ui/Loading";
 import { formatDate } from "@/utils/dateUtils";
 import { Avatar } from "@/components/ui/avatar";
-import { useRouter } from "next/navigation";
-import { CheckCheck, View, X } from "lucide-react";
+import { CheckCheck, X, EllipsisVertical, View } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import DeletePollDialog from "@/components/layouts/DeletePollDialog";
+import FlagPollDialog from "@/components/layouts/FlagPollDialog";
+import EditPollDialog from "@/components/layouts/EditPollDialog";
+import toast from "react-hot-toast";
+import Link from "next/link";
+import {
+  MenuContent,
+  MenuItem,
+  MenuRoot,
+  MenuTrigger,
+} from "@/components/ui/menu";
 
 interface Poll {
   id: string;
@@ -15,7 +26,7 @@ interface Poll {
   slug?: string;
   statement?: string;
   options: string[];
-  startDate: string; // Assuming dates are coming as strings
+  startDate: string;
   endDate: string;
   creatorId: string;
   createdAt: Date | string;
@@ -23,15 +34,24 @@ interface Poll {
   flagged: boolean;
   creatorName?: string;
   creatorAvatar?: string;
-  totalVotes?: number;
+}
+
+interface PollData {
+  title: string;
+  statement: string;
+  options: string[];
+  startDate: Date;
+  endDate: Date;
 }
 
 const PollDetails: React.FC = () => {
   const router = useRouter();
   const { slug } = useParams();
+  const { user, loading: authLoading } = useAuth();
   const [poll, setPoll] = useState<Poll | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdminUser, setIsAdminUser] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,15 +74,64 @@ const PollDetails: React.FC = () => {
       }
     };
 
+    const checkAdminStatus = async () => {
+      if (user?.uid) {
+        const adminStatus = await isAdmin(user.uid);
+        setIsAdminUser(adminStatus);
+      }
+    };
+
     fetchPollDetails();
-  }, [slug]);
+    checkAdminStatus();
+  }, [slug, user?.uid]);
+
+  const handleDelete = async (pollId: string) => {
+    if (!user?.uid) return;
+
+    try {
+      await deletePoll(user.uid, pollId);
+      toast.success("Poll deleted successfully.");
+      router.push("/dashboard/polls"); // Navigate back to the polls list
+    } catch (error) {
+      console.error("Error deleting poll:", error);
+      toast.error("Failed to delete poll.");
+    }
+  };
+
+  const handleFlagToggle = async (pollId: string) => {
+    if (!user?.uid) return;
+
+    try {
+      const newStatus = poll?.flagged ? "active" : "flagged";
+      await flagPoll(user.uid, pollId, newStatus);
+      setPoll((prev) =>
+        prev ? { ...prev, flagged: !prev.flagged, status: newStatus } : null
+      );
+      toast.success(
+        poll?.flagged
+          ? "Poll unflagged successfully."
+          : "Poll flagged successfully."
+      );
+    } catch (error) {
+      console.error("Error flagging/unflagging poll:", error);
+      toast.error("Failed to flag/unflag poll.");
+    }
+  };
+
+  const mapPollToPollData = (poll: Poll): PollData => ({
+    title: poll.title,
+    statement: poll.statement || "",
+    options: poll.options,
+    startDate: new Date(poll.startDate),
+    endDate: new Date(poll.endDate),
+  });
 
   const handleOptionClick = (option: string) => {
     setSelectedOption(option);
     console.log(`User voted for: ${option}`);
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <Loading />;
   }
 
@@ -74,7 +143,8 @@ const PollDetails: React.FC = () => {
     return <div>Poll not found.</div>;
   }
 
-  const totalVotes = poll.totalVotes || 37;
+  const isCreator = poll.creatorId === user?.uid;
+  const canEditOrDelete = isAdminUser || isCreator;
 
   return (
     <div className="container mx-auto flex flex-col w-full p-4">
@@ -82,12 +152,54 @@ const PollDetails: React.FC = () => {
         <div className="flex items-center gap-2">
           <Avatar name="avatar" src={poll.creatorAvatar} className="size-10" />
           <span className="text-3xl font-bold capitalize">
-            {poll.creatorName}
+            {poll.creatorName || "Unknown Creator"}
           </span>
         </div>
-        <View className="cursor-pointer" />
+        <MenuRoot>
+          <MenuTrigger asChild>
+            <div
+              onClick={(event) => event.stopPropagation()}
+              className="cursor-pointer"
+            >
+              <EllipsisVertical />
+            </div>
+          </MenuTrigger>
+          <MenuContent>
+            <MenuItem value="view">
+              <Link
+                href="/profile"
+                className="w-full h-5 flex justify-start items-center rounded-md border-gray-300 hover:border-gray-400 text-gray-700 dark:text-gray-200 gap-2"
+              >
+                <View className="size-4" />
+                <span>View Profile</span>
+              </Link>
+            </MenuItem>
+            {isAdminUser && (
+              <MenuItem value="flag">
+                <FlagPollDialog
+                  pollId={poll.id}
+                  flagged={poll.flagged}
+                  onFlagToggle={handleFlagToggle}
+                />
+              </MenuItem>
+            )}
+            {canEditOrDelete && (
+              <>
+                <MenuItem value="edit">
+                  <EditPollDialog
+                    pollId={poll.id}
+                    currentData={mapPollToPollData(poll)}
+                  />
+                </MenuItem>
+                <MenuItem value="delete">
+                  <DeletePollDialog pollId={poll.id} onDelete={handleDelete} />
+                </MenuItem>
+              </>
+            )}
+          </MenuContent>
+        </MenuRoot>
       </div>
-      <div className="bg-gradient-to-r from-transparent via-gray-900 to-transparent dark:via-gray-500 h-[1px] w-full my-5 "></div>
+      <div className="bg-gradient-to-r from-transparent via-gray-900 to-transparent dark:via-gray-500 h-[1px] w-full my-5 " />
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between">
           <h1 className="text-2xl font-bold capitalize mr-5">{poll.title}</h1>
@@ -133,7 +245,7 @@ const PollDetails: React.FC = () => {
           ))}
         </ul>
         <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
-          {totalVotes} votes
+          40 votes
         </div>
         <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Start Date: {formatDate(poll.startDate)} • End Date:{" "}
