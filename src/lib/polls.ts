@@ -1,5 +1,6 @@
 // polls.ts
 import { db } from "./firebase";
+import { generateSlug } from "@/utils/generateSlug";
 import {
   doc,
   getDoc,
@@ -19,6 +20,7 @@ import {
 interface Poll {
   id: string;
   title: string;
+  slug?: string; 
   statement?: string;
   options: string[];
   startDate: Date;
@@ -73,8 +75,12 @@ export const createPoll = async (
 
     if (userDoc.exists()) {
       const userData = userDoc.data();
+
+      const slug = generateSlug(pollData.title);
+
       await addDoc(collection(db, "polls"), {
         ...pollData,
+        slug,
         creatorId: userId,
         creatorName: userData.name,
         creatorAvatar: userData.avatar,
@@ -104,7 +110,13 @@ export const editPoll = async (
     if (pollDoc.exists()) {
       const poll = pollDoc.data();
       if (poll.creatorId === userId || (await isAdmin(userId))) {
-        await updateDoc(pollDocRef, pollData);
+        const updateData = { ...pollData } as Partial<Poll> & { slug?: string };
+
+        if (pollData.title) {
+          updateData.slug = generateSlug(pollData.title);
+        }
+
+        await updateDoc(pollDocRef, updateData);
       } else {
         throw new Error("You do not have permission to edit this poll.");
       }
@@ -150,7 +162,7 @@ export const viewPolls = async (
     const pollsRef = collection(db, "polls");
 
     const validFilters = Object.entries(filter).filter(
-      ([, value]) => value !== undefined 
+      ([, value]) => value !== undefined
     );
 
     const queryConditions = validFilters.map(([field, value]) =>
@@ -168,8 +180,6 @@ export const viewPolls = async (
     throw new Error("Unable to fetch polls.");
   }
 };
-
-
 
 // Function to flag a poll as inappropriate (admin only)
 export const flagPoll = async (
