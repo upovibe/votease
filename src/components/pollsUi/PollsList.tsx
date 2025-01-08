@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { viewPolls, deletePoll, flagPoll, isAdmin } from "@/lib/polls";
 import { Avatar } from "@/components/ui/avatar";
-import { Flag, FlagOff, CheckCheck, X, Vote } from "lucide-react";
+import { Flag, FlagOff, CheckCheck, X, Vote, View } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatDate } from "@/utils/dateUtils";
 import Link from "next/link";
@@ -65,7 +65,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
       try {
         setPollLoading(true);
         const fetchedPolls = await viewPolls({
-          creatorId: filterByCreator ? user.uid : undefined, // Fetch polls based on the filter
+          creatorId: filterByCreator ? user.uid : undefined,
         });
         setPolls(
           fetchedPolls.map((poll) => ({
@@ -169,7 +169,6 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
       console.error("Poll slug is missing.");
     }
   };
-  
 
   return (
     <div className="p-4 space-y-5">
@@ -182,7 +181,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
           {filteredPolls.map((poll) => (
             <div
               key={poll.id}
-              onClick={() => handleViewPoll(poll)} 
+              onClick={() => handleViewPoll(poll)}
               className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear"
             >
               <div className="flex items-center w-full justify-between gap-2">
@@ -199,9 +198,20 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
                 {(isAdminUser || poll.creatorId === user.uid) && (
                   <MenuRoot>
                     <MenuTrigger asChild>
-                      <EllipsisVertical />
+                      <div onClick={(event) => event.stopPropagation()}>
+                        <EllipsisVertical />
+                      </div>
                     </MenuTrigger>
                     <MenuContent>
+                      <MenuItem value="view">
+                        <Link
+                          href={"/dashboard/polls/slug"}
+                          className="w-full h-5 flex justify-start items-center rounded-md border-gray-300 hover:border-gray-400 text-gray-700 dark:text-gray-200 gap-2"
+                        >
+                          <View className="size-4" />
+                          <span>View</span>
+                        </Link>
+                      </MenuItem>
                       {isAdminUser && (
                         <MenuItem value="flag">
                           <FlagPollDialog
