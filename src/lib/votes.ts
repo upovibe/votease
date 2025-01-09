@@ -16,6 +16,7 @@ import {
   // Query,
   // CollectionReference,
 } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 // Define the Vote interface for type safety
 interface Vote {
@@ -25,6 +26,7 @@ interface Vote {
   createdAt: FieldValue;
 }
 
+// Function to cast a vote for a poll
 // Function to cast a vote for a poll
 export const castVote = async (
   userId: string,
@@ -41,7 +43,8 @@ export const castVote = async (
     const existingVoteSnapshot = await getDocs(existingVoteRef);
 
     if (existingVoteSnapshot.docs.length > 0) {
-      throw new Error("You have already voted for this poll.");
+      toast.error("You have already voted for this poll.");
+      return; // Stop further execution
     }
 
     const voteData: Vote = {
@@ -54,8 +57,8 @@ export const castVote = async (
     // Add the vote data to Firestore
     await addDoc(voteRef, voteData);
   } catch (error) {
+    toast.error("Error casting vote.");
     console.error("Error casting vote:", error);
-    throw error;
   }
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { viewPolls, deletePoll, flagPoll, isAdmin } from "@/lib/polls";
 import {
@@ -12,7 +12,7 @@ import {
 import Loading from "@/components/ui/Loading";
 import { formatDate } from "@/utils/dateUtils";
 import { Avatar } from "@/components/ui/avatar";
-import { CheckCheck, RefreshCcw onClick={refresh componenet}, X } from "lucide-react";
+import { CheckCheck, RefreshCcw, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 import PollMenu from "@/components/pollsUi/PollMenu";
@@ -56,46 +56,58 @@ const PollDetails: React.FC = () => {
   );
   const [totalVotes, setTotalVotes] = useState<number>(0);
 
-  useEffect(() => {
+  // Fetch poll data
+  const fetchPollDetails = useCallback(async () => {
     if (!slug || Array.isArray(slug)) return;
 
-    const fetchPollDetails = async () => {
-      try {
-        setLoading(true);
-        const polls = await viewPolls({ slug });
-        if (polls.length > 0) {
-          setPoll(polls[0]);
-        } else {
-          setError("Poll not found.");
-        }
-      } catch (error) {
-        console.error(error);
-        setError("Error fetching poll details.");
-      } finally {
-        setLoading(false);
+    try {
+      setLoading(true);
+      const polls = await viewPolls({ slug });
+      if (polls.length > 0) {
+        setPoll(polls[0]);
+      } else {
+        setError("Poll not found.");
       }
-    };
+    } catch (error) {
+      console.error(error);
+      setError("Error fetching poll details.");
+    } finally {
+      setLoading(false);
+    }
+  }, [slug]);
 
-    const checkAdminStatus = async () => {
-      if (user?.uid) {
-        const adminStatus = await isAdmin(user.uid);
-        setIsAdminUser(adminStatus);
-      }
-    };
+  // Fetch vote counts
+  const fetchVoteCounts = useCallback(async () => {
+    if (poll?.id) {
+      const counts = await getVoteCount(poll.id);
+      const total = await getTotalVoteCount(poll.id);
+      setVoteCounts(counts);
+      setTotalVotes(total);
+    }
+  }, [poll?.id]);
 
-    const fetchVoteCounts = async () => {
-      if (poll?.id) {
-        const counts = await getVoteCount(poll.id);
-        const total = await getTotalVoteCount(poll.id);
-        setVoteCounts(counts);
-        setTotalVotes(total);
-      }
-    };
+  // Check if the user is an admin
+  const checkAdminStatus = useCallback(async () => {
+    if (user?.uid) {
+      const adminStatus = await isAdmin(user.uid);
+      setIsAdminUser(adminStatus);
+    }
+  }, [user?.uid]);
 
+  // Refresh component
+  const refreshComponent = async () => {
+    await fetchPollDetails();
+    await fetchVoteCounts();
+  };
+
+  useEffect(() => {
     fetchPollDetails();
     checkAdminStatus();
+  }, [fetchPollDetails, checkAdminStatus]);
+
+  useEffect(() => {
     fetchVoteCounts();
-  }, [slug, user?.uid, poll?.id]);
+  }, [poll?.id, fetchVoteCounts]);
 
   const handleVote = async (option: string) => {
     if (!user?.uid || !poll?.id) return;
@@ -116,13 +128,10 @@ const PollDetails: React.FC = () => {
       toast.success(`Voted for: ${option}`);
 
       // Refresh vote counts
-      const counts = await getVoteCount(poll.id);
-      const total = await getTotalVoteCount(poll.id);
-      setVoteCounts(counts);
-      setTotalVotes(total);
+      await fetchVoteCounts();
     } catch (error) {
       console.error("Error casting vote:", error);
-      toast.error("Failed to cast vote.");
+      toast.error("Already voted.");
     }
   };
 
@@ -135,10 +144,7 @@ const PollDetails: React.FC = () => {
       toast.success("Vote undone.");
 
       // Refresh vote counts
-      const counts = await getVoteCount(poll.id);
-      const total = await getTotalVoteCount(poll.id);
-      setVoteCounts(counts);
-      setTotalVotes(total);
+      await fetchVoteCounts();
     } catch (error) {
       console.error("Error undoing vote:", error);
       toast.error("Failed to undo vote.");
@@ -268,14 +274,18 @@ const PollDetails: React.FC = () => {
           <div className="text-sm text-gray-700 dark:text-gray-300">
             {totalVotes} total votes
           </div>
- <div>
- {selectedOption && (
-            <Button variant="plain" size="xs" className="h-fit px-2 bg-red-500 hover:bg-red-600">
-              Undo
-            </Button>
-          )}
-          <RefreshCcw onClick={refreshcomponenet} className="cursor-pointer"/>
- </div>
+          <div className="flex items-center gap-1">
+            {selectedOption && (
+              <Button
+                variant="plain"
+                size="xs"
+                className="h-fit px-2 bg-red-500 hover:bg-red-600"
+              >
+                Undo
+              </Button>
+            )}
+            <RefreshCcw onClick={refreshComponent} className="cursor-pointer" />
+          </div>
         </div>
         <div className="px-2 text-sm text-gray-600 dark:text-gray-400">
           Start Date: {formatDate(poll.startDate)} • End Date:{" "}
