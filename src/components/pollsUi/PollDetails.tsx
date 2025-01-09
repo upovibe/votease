@@ -16,6 +16,7 @@ import { CheckCheck, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 import PollMenu from "@/components/pollsUi/PollMenu";
+import { Button } from "@chakra-ui/react";
 
 interface Poll {
   id: string;
@@ -263,20 +264,17 @@ const PollDetails: React.FC = () => {
             </li>
           ))}
         </ul>
-
-        {selectedOption && (
-          <button
-            onClick={handleUndoVote}
-            className="mt-3 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
-          >
-            Undo Vote
-          </button>
-        )}
-
-        <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
-          {totalVotes} total votes
+        <div className="flex items-center gap-4 justify-between mb-2 mt-3 px-2">
+          <div className="text-sm text-gray-700 dark:text-gray-300">
+            {totalVotes} total votes
+          </div>
+          {selectedOption && (
+            <Button variant="plain" size="xs" className="h-fit px-2 bg-red-500 hover:bg-red-600">
+              Undo
+            </Button>
+          )}
         </div>
-        <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <div className="px-2 text-sm text-gray-600 dark:text-gray-400">
           Start Date: {formatDate(poll.startDate)} • End Date:{" "}
           {formatDate(poll.endDate)}
         </div>
