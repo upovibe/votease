@@ -12,7 +12,7 @@ import {
 import Loading from "@/components/ui/Loading";
 import { formatDate } from "@/utils/dateUtils";
 import { Avatar } from "@/components/ui/avatar";
-import { CheckCheck, X } from "lucide-react";
+import { CheckCheck, RefreshCcw onClick={refresh componenet}, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 import PollMenu from "@/components/pollsUi/PollMenu";
@@ -268,11 +268,14 @@ const PollDetails: React.FC = () => {
           <div className="text-sm text-gray-700 dark:text-gray-300">
             {totalVotes} total votes
           </div>
-          {selectedOption && (
+ <div>
+ {selectedOption && (
             <Button variant="plain" size="xs" className="h-fit px-2 bg-red-500 hover:bg-red-600">
               Undo
             </Button>
           )}
+          <RefreshCcw onClick={refreshcomponenet} className="cursor-pointer"/>
+ </div>
         </div>
         <div className="px-2 text-sm text-gray-600 dark:text-gray-400">
           Start Date: {formatDate(poll.startDate)} • End Date:{" "}
