@@ -101,16 +101,12 @@ const PollDetails: React.FC = () => {
 
     try {
       if (selectedOption === option) {
-        toast.error(
-          "You have already voted for this option. Undo your vote first to vote again."
-        );
+        toast.error("Already voted. Undo to vote again.");
         return;
       }
 
       if (selectedOption) {
-        toast.error(
-          "You have already voted. Undo your vote first to change your vote."
-        );
+        toast.error("Already voted. Undo to change.");
         return;
       }
 
