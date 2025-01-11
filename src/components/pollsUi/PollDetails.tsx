@@ -113,41 +113,18 @@ const PollDetails: React.FC = () => {
     if (!user?.uid || !poll?.id) return;
 
     try {
-      if (selectedOption === option) {
-        toast.error("Already voted. Undo to vote again.");
-        return;
-      }
-
       if (selectedOption) {
-        toast.error("Already voted. Undo to change.");
+        toast.error("You have already voted.");
         return;
       }
 
       await castVote(user.uid, poll.id, option);
       setSelectedOption(option);
       toast.success(`Voted for: ${option}`);
-
-      // Refresh vote counts
       await fetchVoteCounts();
     } catch (error) {
       console.error("Error casting vote:", error);
-      toast.error("Already voted.");
-    }
-  };
-
-  const handleUndoVote = async () => {
-    if (!user?.uid || !poll?.id || !selectedOption) return;
-
-    try {
-      await undoVote(user.uid, poll.id);
-      setSelectedOption(null);
-      toast.success("Vote undone.");
-
-      // Refresh vote counts
-      await fetchVoteCounts();
-    } catch (error) {
-      console.error("Error undoing vote:", error);
-      toast.error("Failed to undo vote.");
+      toast.error("Failed to cast vote.");
     }
   };
 
@@ -255,35 +232,27 @@ const PollDetails: React.FC = () => {
         <p className="text-gray-600 lowercase mb-8">{poll.statement}</p>
       </div>
       <div className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear">
-        <ul className="space-y-3">
+        <div className="flex flex-col gap-3">
           {poll.options.map((option, index) => (
-            <li
+            <Button
               key={index}
               onClick={() => handleVote(option)}
-              className={`px-3 py-1 rounded-full cursor-pointer border-4 hover:shadow-lg ${
+              disabled={selectedOption !== null && selectedOption !== option}
+              className={`px-3 py-1 rounded-full cursor-pointer ${
                 selectedOption === option
                   ? "bg-gray-500 text-white dark:border-gray-300 border-gray-700"
                   : "bg-gray-100 dark:bg-gray-900 dark:text-white border-transparent"
               } hover:bg-gray-500 hover:text-white hover:dark:border-gray-300 hover:border-gray-700 transition-all duration-300 ease-in-out`}
             >
-              {option} - {voteCounts[option] || 0} votes
-            </li>
+              <span className="text-left w-full">{option} - {voteCounts[option] || 0} votes</span>
+            </Button>
           ))}
-        </ul>
+        </div>
         <div className="flex items-center gap-4 justify-between mb-2 mt-3 px-2">
           <div className="text-sm text-gray-700 dark:text-gray-300">
             {totalVotes} total votes
           </div>
           <div className="flex items-center gap-1">
-            {selectedOption && (
-              <Button
-                variant="plain"
-                size="xs"
-                className="h-fit px-2 bg-red-500 hover:bg-red-600"
-              >
-                Undo
-              </Button>
-            )}
             <RefreshCcw onClick={refreshComponent} className="cursor-pointer" />
           </div>
         </div>
