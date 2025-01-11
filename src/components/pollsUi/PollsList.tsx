@@ -182,7 +182,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
             <div
               key={poll.id}
               onClick={() => handleViewPoll(poll)}
-              className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear"
+              className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 flex flex-col gap-3 cursor-pointer hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear overflow-hidden "
             >
               <div className="flex items-center w-full justify-between gap-2">
                 <div className="flex items-center gap-2">
@@ -246,9 +246,9 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 <Link
                   href="/dashboard/polls/slug"
-                  className="text-gray-600 dark:text-gray-200 hover:underline"
+                  className="text-gray-600 dark:text-gray-200 hover:underline truncate max-w-[250px] text-ellipsis"
                 >
-                  {poll.statement}
+                  {poll.statement.substring(0, 40)}{poll.statement.length > 40 ? '...' : ''}
                 </Link>
                 <br />
                 <div className="flex items-center justify-between">
