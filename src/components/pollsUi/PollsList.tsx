@@ -239,7 +239,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
               </div>
               <div className="flex items-center gap-2 bg-gray-800/50 dark:bg-gray-200/50 w-fit px-3 py-1 rounded-full">
                 <Vote className="size-4 text-white dark:text-black" />
-                <h3 className="font-semibold text-sm text-white dark:text-black">
+                <h3 className="font-semibold text-sm text-white dark:text-black truncate max-w-[220px] overflow-hidden text-ellipsis">
                   {poll.title}
                 </h3>
               </div>
