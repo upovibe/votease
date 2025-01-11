@@ -71,7 +71,12 @@ const PollDetails: React.FC = () => {
       setLoading(true);
       const polls = await viewPolls({ slug });
       if (polls.length > 0) {
-        setPoll(polls[0]);
+        const normalizedPoll = {
+          ...polls[0],
+          startDate: new Date(polls[0].startDate).toISOString(),
+          endDate: new Date(polls[0].endDate).toISOString(),
+        };
+        setPoll(normalizedPoll);
       } else {
         setError("Poll not found.");
       }
