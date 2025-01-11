@@ -3,12 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { viewPolls, deletePoll, flagPoll, isAdmin } from "@/lib/polls";
-import {
-  castVote,
-  undoVote,
-  getVoteCount,
-  getTotalVoteCount,
-} from "@/lib/votes";
+import { castVote, getVoteCount, getTotalVoteCount } from "@/lib/votes";
 import Loading from "@/components/ui/Loading";
 import { formatDate } from "@/utils/dateUtils";
 import { Avatar } from "@/components/ui/avatar";
@@ -17,6 +12,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 import PollMenu from "@/components/pollsUi/PollMenu";
 import { Button } from "@chakra-ui/react";
+import {
+  DialogRoot,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+  DialogFooter,
+  DialogActionTrigger,
+  DialogCloseTrigger,
+} from "@/components/ui/dialog";
 
 interface Poll {
   id: string;
@@ -50,11 +56,10 @@ const PollDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [voteCounts, setVoteCounts] = useState<{ [option: string]: number }>(
-    {}
-  );
+  const [voteCounts, setVoteCounts] = useState<{ [option: string]: number }>({});
   const [totalVotes, setTotalVotes] = useState<number>(0);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [confirmVote, setConfirmVote] = useState<string | null>(null);
 
   // Fetch poll data
   const fetchPollDetails = useCallback(async () => {
@@ -86,6 +91,16 @@ const PollDetails: React.FC = () => {
     }
   }, [poll?.id]);
 
+  useEffect(() => {
+    // On mount, retrieve the previously selected option from localStorage
+    if (poll?.id) {
+      const storedOption = localStorage.getItem(`selectedOption-${poll.id}`);
+      if (storedOption) {
+        setSelectedOption(storedOption);
+      }
+    }
+  }, [poll?.id]);
+
   // Check if the user is an admin
   const checkAdminStatus = useCallback(async () => {
     if (user?.uid) {
@@ -109,25 +124,42 @@ const PollDetails: React.FC = () => {
     fetchVoteCounts();
   }, [poll?.id, fetchVoteCounts]);
 
-  const handleVote = async (option: string) => {
-    if (!user?.uid || !poll?.id) return;
+  // const handleVote = async (option: string) => {
+  //   if (!user?.uid || !poll?.id) return;
 
+  //   try {
+  //     if (selectedOption) {
+  //       toast.error("You have already voted.");
+  //       return;
+  //     }
+
+  //     await castVote(user.uid, poll.id, option);
+  //     setSelectedOption(option);
+  //     toast.success(`Voted for: ${option}`);
+  //     await fetchVoteCounts();
+  //   } catch (error) {
+  //     console.error("Error casting vote:", error);
+  //     toast.error("Failed to cast vote.");
+  //   }
+  // };
+
+  const handleVote = async () => {
+    if (!user?.uid || !poll?.id || !confirmVote) return;
+  
     try {
-      if (selectedOption) {
-        toast.error("You have already voted.");
-        return;
-      }
-
-      await castVote(user.uid, poll.id, option);
-      setSelectedOption(option);
-      toast.success(`Voted for: ${option}`);
+      await castVote(user.uid, poll.id, confirmVote);
+      setSelectedOption(confirmVote);
+      // Save the selected option to localStorage
+      localStorage.setItem(`selectedOption-${poll.id}`, confirmVote);
+      setConfirmVote(null);
+      toast.success(`Voted for: ${confirmVote}`);
       await fetchVoteCounts();
     } catch (error) {
       console.error("Error casting vote:", error);
       toast.error("Failed to cast vote.");
     }
   };
-
+  
   const handleDelete = async (pollId: string) => {
     if (!user?.uid) return;
 
@@ -233,20 +265,53 @@ const PollDetails: React.FC = () => {
       </div>
       <div className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear">
         <div className="flex flex-col gap-3">
-          {poll.options.map((option, index) => (
-            <Button
-              key={index}
-              onClick={() => handleVote(option)}
-              disabled={selectedOption !== null && selectedOption !== option}
-              className={`px-3 py-1 rounded-full cursor-pointer ${
-                selectedOption === option
-                  ? "bg-gray-500 text-white dark:border-gray-300 border-gray-700"
-                  : "bg-gray-100 dark:bg-gray-900 dark:text-white border-transparent"
-              } hover:bg-gray-500 hover:text-white hover:dark:border-gray-300 hover:border-gray-700 transition-all duration-300 ease-in-out`}
-            >
-              <span className="text-left w-full">{option} - {voteCounts[option] || 0} votes</span>
-            </Button>
-          ))}
+          <>
+          {poll.options.map((option) => (
+              <DialogRoot key={option}>
+                <DialogTrigger asChild>
+                  <Button
+                    onClick={() => setConfirmVote(option)}
+                    disabled={selectedOption !== null} 
+                    className={`px-3 py-1 rounded-full cursor-pointer ${
+                      selectedOption === option
+                        ? "bg-blue-500 text-white border border-blue-700"
+                        : "bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent"
+                    } hover:bg-blue-500 hover:text-white transition-all duration-300 ease-in-out ${
+                      selectedOption !== null && selectedOption !== option
+                        ? "opacity-50 cursor-not-allowed" // Grayed-out style for unselected options
+                        : ""
+                    }`}
+                  >
+                    <span className="text-left w-full">
+                      {option} - {voteCounts[option] || 0} votes
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                  <DialogTitle>Confirm Your Vote</DialogTitle>
+                  </DialogHeader>
+                  <DialogBody>
+                <p>Are you sure you want to vote for &quot;{option}&quot;? This action cannot be undone.</p>
+              </DialogBody>
+                  <DialogFooter>
+                    <DialogActionTrigger asChild>
+                    <Button
+                    onClick={() => {
+                      setConfirmVote(null);
+                    }}
+                    variant="outline"
+                  >
+                    Cancel
+                  </Button>
+                    </DialogActionTrigger>
+                    <Button onClick={handleVote}>Continue</Button>
+                  </DialogFooter>
+                  <DialogCloseTrigger />
+                </DialogContent>
+              </DialogRoot>
+            ))}
+          </>
         </div>
         <div className="flex items-center gap-4 justify-between mb-2 mt-3 px-2">
           <div className="text-sm text-gray-700 dark:text-gray-300">
