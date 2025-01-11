@@ -56,7 +56,9 @@ const PollDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
-  const [voteCounts, setVoteCounts] = useState<{ [option: string]: number }>({});
+  const [voteCounts, setVoteCounts] = useState<{ [option: string]: number }>(
+    {}
+  );
   const [totalVotes, setTotalVotes] = useState<number>(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [confirmVote, setConfirmVote] = useState<string | null>(null);
@@ -92,7 +94,6 @@ const PollDetails: React.FC = () => {
   }, [poll?.id]);
 
   useEffect(() => {
-    // On mount, retrieve the previously selected option from localStorage
     if (poll?.id) {
       const storedOption = localStorage.getItem(`selectedOption-${poll.id}`);
       if (storedOption) {
@@ -124,28 +125,9 @@ const PollDetails: React.FC = () => {
     fetchVoteCounts();
   }, [poll?.id, fetchVoteCounts]);
 
-  // const handleVote = async (option: string) => {
-  //   if (!user?.uid || !poll?.id) return;
-
-  //   try {
-  //     if (selectedOption) {
-  //       toast.error("You have already voted.");
-  //       return;
-  //     }
-
-  //     await castVote(user.uid, poll.id, option);
-  //     setSelectedOption(option);
-  //     toast.success(`Voted for: ${option}`);
-  //     await fetchVoteCounts();
-  //   } catch (error) {
-  //     console.error("Error casting vote:", error);
-  //     toast.error("Failed to cast vote.");
-  //   }
-  // };
-
   const handleVote = async () => {
     if (!user?.uid || !poll?.id || !confirmVote) return;
-  
+
     try {
       await castVote(user.uid, poll.id, confirmVote);
       setSelectedOption(confirmVote);
@@ -159,7 +141,7 @@ const PollDetails: React.FC = () => {
       toast.error("Failed to cast vote.");
     }
   };
-  
+
   const handleDelete = async (pollId: string) => {
     if (!user?.uid) return;
 
@@ -266,12 +248,12 @@ const PollDetails: React.FC = () => {
       <div className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear">
         <div className="flex flex-col gap-3">
           <>
-          {poll.options.map((option) => (
+            {poll.options.map((option) => (
               <DialogRoot key={option}>
                 <DialogTrigger asChild>
                   <Button
                     onClick={() => setConfirmVote(option)}
-                    disabled={selectedOption !== null} 
+                    disabled={selectedOption !== null}
                     className={`px-3 py-1 rounded-full cursor-pointer ${
                       selectedOption === option
                         ? "bg-blue-500 text-white border border-blue-700"
@@ -289,21 +271,24 @@ const PollDetails: React.FC = () => {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                  <DialogTitle>Confirm Your Vote</DialogTitle>
+                    <DialogTitle>Confirm Your Vote</DialogTitle>
                   </DialogHeader>
                   <DialogBody>
-                <p>Are you sure you want to vote for &quot;{option}&quot;? This action cannot be undone.</p>
-              </DialogBody>
+                    <p>
+                      Are you sure you want to vote for &quot;{option}&quot;?
+                      This action cannot be undone.
+                    </p>
+                  </DialogBody>
                   <DialogFooter>
                     <DialogActionTrigger asChild>
-                    <Button
-                    onClick={() => {
-                      setConfirmVote(null);
-                    }}
-                    variant="outline"
-                  >
-                    Cancel
-                  </Button>
+                      <Button
+                        onClick={() => {
+                          setConfirmVote(null);
+                        }}
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
                     </DialogActionTrigger>
                     <Button onClick={handleVote}>Continue</Button>
                   </DialogFooter>
