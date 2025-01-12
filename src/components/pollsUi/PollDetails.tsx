@@ -30,8 +30,8 @@ interface Poll {
   slug?: string;
   statement?: string;
   options: string[];
-  startDate: string;
-  endDate: string;
+  startDate: string; // From API, assume it's a string
+  endDate: string;   // From API, assume it's a string
   creatorId: string;
   createdAt: Date | string;
   status: string;
@@ -66,15 +66,15 @@ const PollDetails: React.FC = () => {
   // Fetch poll data
   const fetchPollDetails = useCallback(async () => {
     if (!slug || Array.isArray(slug)) return;
-
+  
     try {
       setLoading(true);
       const polls = await viewPolls({ slug });
       if (polls.length > 0) {
         const normalizedPoll = {
           ...polls[0],
-          startDate: new Date(polls[0].startDate).toISOString(),
-          endDate: new Date(polls[0].endDate).toISOString(),
+          startDate: formatDate(polls[0].startDate),
+          endDate: formatDate(polls[0].endDate), 
         };
         setPoll(normalizedPoll);
       } else {
@@ -184,9 +184,10 @@ const PollDetails: React.FC = () => {
     title: poll.title,
     statement: poll.statement || "",
     options: poll.options,
-    startDate: new Date(poll.startDate),
-    endDate: new Date(poll.endDate),
+    startDate: new Date(poll.startDate),  // Convert to Date
+    endDate: new Date(poll.endDate),      // Convert to Date
   });
+  
 
   if (authLoading || loading) {
     return <Loading />;

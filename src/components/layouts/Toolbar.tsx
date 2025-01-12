@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Input, Kbd } from "@chakra-ui/react";
 import { InputGroup } from "@/components/ui/input-group";
-import { Plus, Search } from "lucide-react";
+import { Plus, RefreshCcw, Search } from "lucide-react";
 import {
   SelectContent,
   SelectItem,
@@ -24,9 +24,10 @@ import CreatePoll from "@/components/form/CreatePoll";
 // Explicitly define the type for the props
 interface ToolbarProps {
   setSearchQuery: (query: string) => void;
+  refreshComponent: () => void; // Add this prop
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ setSearchQuery }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ setSearchQuery, refreshComponent }) => {
   const items = [
     { label: "Option 1", value: "option-1" },
     { label: "Option 2", value: "option-2" },
@@ -83,6 +84,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSearchQuery }) => {
           </DialogBody>
         </DialogContent>
       </DialogRoot>
+      <RefreshCcw onClick={refreshComponent} className="cursor-pointer" />
     </div>
   );
 };

@@ -18,23 +18,23 @@ interface Poll {
   title: string;
   statement?: string;
   options: string[];
-  startDate: string;
-  endDate: string;
+  startDate: string; // Keep as string
+  endDate: string;   // Keep as string
 }
 
 // Use the defined Poll type in PollMenuProps
 interface PollMenuProps {
   isAdminUser: boolean;
   canEditOrDelete: boolean;
-  poll: Poll;
+  poll: Poll;  // poll is of type Poll
   onFlagToggle: (pollId: string) => void;
   onDelete: (pollId: string) => void;
   mapPollToPollData: (poll: Poll) => {
     title: string;
     statement: string;
     options: string[];
-    startDate: Date;
-    endDate: Date;
+    startDate: Date;  // map to Date
+    endDate: Date;    // map to Date
   };
 }
 
@@ -76,7 +76,7 @@ const PollMenu: React.FC<PollMenuProps> = ({
           <MenuItem value="edit">
             <EditPollDialog
               pollId={poll.id}
-              currentData={mapPollToPollData(poll)}
+              currentData={mapPollToPollData(poll)}  // pass converted data
             />
           </MenuItem>
           <MenuItem value="delete">

@@ -57,6 +57,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pollLoading, setPollLoading] = useState(true);
+  const [refreshFlag, setRefreshFlag] = useState(false); // State to trigger refresh
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -93,7 +94,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
 
     fetchPolls();
     checkAdminStatus();
-  }, [user?.uid, filterByCreator]);
+  }, [user?.uid, filterByCreator, refreshFlag]); // Trigger refresh when refreshFlag changes
 
   const handleDelete = async (pollId: string) => {
     if (!user?.uid) return;
@@ -102,6 +103,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
       await deletePoll(user.uid, pollId);
       setPolls((prevPolls) => prevPolls.filter((poll) => poll.id !== pollId));
       toast.success("Poll deleted successfully.");
+      setRefreshFlag((prev) => !prev); // Trigger component refresh
     } catch (error) {
       console.error("Error deleting poll:", error);
       toast.error("Failed to delete poll.");
@@ -128,6 +130,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
             ? "Poll unflagged successfully."
             : "Poll flagged successfully."
         );
+        setRefreshFlag((prev) => !prev); // Trigger component refresh
       }
     } catch (error) {
       console.error("Error flagging/unflagging poll:", error);
@@ -172,7 +175,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
 
   return (
     <div className="p-4 space-y-5">
-      {polls.length > 0 && <Toolbar setSearchQuery={setSearchQuery} />}
+      {polls.length > 0 && <Toolbar setSearchQuery={setSearchQuery} refreshComponent={() => setRefreshFlag((prev) => !prev)} />}
 
       {polls.length === 0 ? (
         <FirstPollCTA />
