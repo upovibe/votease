@@ -1,10 +1,13 @@
-import PollsList from '@/components/pollsUi/PollsList'
-import React from 'react'
+import dynamic from 'next/dynamic'
+
+const PollsList = dynamic(() => import('@/components/pollsUi/PollsList'), {
+  ssr: false, // Disable SSR for this component
+})
 
 const page = () => {
   return (
     <div>
-      <PollsList filterByCreator/>
+      <PollsList filterByCreator />
     </div>
   )
 }
