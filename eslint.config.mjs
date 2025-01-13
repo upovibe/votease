@@ -13,7 +13,8 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
-      "@typescript-eslint/no-empty-interface": "off", // Disable the rule globally
+      "@typescript-eslint/no-empty-interface": "off", // Disable empty interface rule
+      "@typescript-eslint/no-empty-object-type": "off", // Disable empty object type rule
     },
   },
 ];
