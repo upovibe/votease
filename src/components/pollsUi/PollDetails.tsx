@@ -10,7 +10,6 @@ import { Avatar } from "@/components/ui/avatar";
 import { CheckCheck, RefreshCcw, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
-// import PollMenu from "@/components/pollsUi/PollMenu";
 import Link from "next/link";
 import { EllipsisVertical, View } from "lucide-react";
 import {
@@ -228,15 +227,6 @@ const PollDetails: React.FC = () => {
             {poll.creatorName || "Unknown Creator"}
           </span>
         </div>
-        {/* <PollMenu
-          isAdminUser={isAdminUser}
-          canEditOrDelete={canEditOrDelete}
-          poll={poll}
-          onFlagToggle={handleFlagToggle}
-          onDelete={handleDelete}
-          mapPollToPollData={mapPollToPollData}
-        /> */}
-        {/* Poll Menu directly inside the details component */}
         <MenuRoot>
           <MenuTrigger asChild>
             <div className="cursor-pointer">
