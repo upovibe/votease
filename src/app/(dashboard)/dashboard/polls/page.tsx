@@ -1,9 +1,10 @@
-import PollsList from '@/components/pollsUi/PollsList'
+// import PollsList from '@/components/pollsUi/PollsList'
 
 const page = () => {
   return (
     <div>
-      <PollsList filterByCreator/>
+      {/* <PollsList filterByCreator/> */}
+      POLL
     </div>
   )
 }

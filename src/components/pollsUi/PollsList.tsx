@@ -63,7 +63,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pollLoading, setPollLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false); // State to trigger refresh
+  const [refreshFlag, setRefreshFlag] = useState(false);
 
   useEffect(() => {
     const fetchPolls = async () => {
