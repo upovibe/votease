@@ -33,17 +33,13 @@ import {
   };
   
   // Function to sign up a new user
-  export const signupUser = async (
-    email: string,
-    password: string
-  ): Promise<User> => {
+  export const signupUser = async (email: string, password: string): Promise<User> => {
     try {
-      const userCredential: UserCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+  
+      // Determine if the user is an admin
+      const role = email === adminEmail ? "admin" : "user";
   
       // Save user data to Firestore
       await setDoc(doc(db, "users", user.uid), {
@@ -53,6 +49,7 @@ import {
         provider: "email",
         avatar: user.photoURL,
         createdAt: new Date(),
+        role, // Add role field
       });
   
       return user;
@@ -65,7 +62,7 @@ import {
         throw error;
       }
     }
-  };
+  };  
   
   // Function to sign in with Google
   export const signInWithGoogle = async (): Promise<User> => {
