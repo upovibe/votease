@@ -256,66 +256,6 @@ const PollDetails: React.FC = () => {
         <p className="text-gray-600 lowercase mb-8">{poll.statement}</p>
       </div>
       <div className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear">
-        {/* <div className="flex flex-col gap-3">
-          {poll.options.map((option) => {
-            const votes = voteCounts[option] || 0;
-            const percentage = calculatePercentage(votes);
-            return (
-              <div key={option} className="flex flex-col gap-2">
-                <DialogRoot>
-                  <DialogTrigger asChild>
-                    <Button
-                      onClick={() => setConfirmVote(option)}
-                      disabled={selectedOption !== null}
-                      className={`px-3 py-1 rounded-full cursor-pointer ${
-                        selectedOption === option
-                          ? "bg-blue-500 text-white border border-blue-700"
-                          : "bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent"
-                      } hover:bg-blue-500 hover:text-white transition-all duration-300 ease-in-out ${
-                        selectedOption !== null && selectedOption !== option
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                    >
-                      <span className="text-left w-full">{option}</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Confirm Your Vote</DialogTitle>
-                    </DialogHeader>
-                    <DialogBody>
-                      <p>
-                        Are you sure you want to vote for &quot;{option}&quot;?
-                      </p>
-                    </DialogBody>
-                    <DialogFooter>
-                      <DialogActionTrigger asChild>
-                        <Button
-                          onClick={() => {
-                            setConfirmVote(null);
-                          }}
-                          variant="outline"
-                        >
-                          Cancel
-                        </Button>
-                      </DialogActionTrigger>
-                      <Button onClick={handleVote}>Continue</Button>
-                    </DialogFooter>
-                    <DialogCloseTrigger />
-                  </DialogContent>
-                </DialogRoot>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {votes} votes - {percentage.toFixed(2)}%
-                </div>
-                <div
-                  className="h-2 rounded-full bg-gray-200 dark:bg-gray-700"
-                  style={{ width: `${percentage}%` }}
-                ></div>
-              </div>
-            );
-          })}
-        </div> */}
         <div className="flex flex-col gap-3">
           {poll.options.map((option) => {
             const votes = voteCounts[option] || 0;
@@ -328,7 +268,7 @@ const PollDetails: React.FC = () => {
                     <Button
                       onClick={() => setConfirmVote(option)}
                       disabled={selectedOption !== null}
-                      className={`relative overflow-hidden px-3 py-1 mx-2 rounded-full cursor-pointer ${
+                      className={`relative overflow-hidden px-3 py-1 rounded-full cursor-pointer ${
                         selectedOption === option
                           ? "bg-blue-500 text-white border border-blue-700"
                           : "bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent"
@@ -340,7 +280,7 @@ const PollDetails: React.FC = () => {
                     >
                       {/* Progress bar inside the button */}
                       <div
-                        className="absolute inset-0 h-1/2 my-auto rounded-full bg-blue-400 dark:bg-blue-700"
+                        className="absolute inset-0 h-4/6 mx-1 my-auto rounded-full bg-blue-400 dark:bg-blue-700"
                         style={{
                           width: `${percentage}%`,
                           zIndex: 0,
