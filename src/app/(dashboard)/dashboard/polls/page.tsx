@@ -1,5 +1,3 @@
-"use client";
-
 import PollsList from '@/components/pollsUi/PollsList'
 
 const page = () => {
