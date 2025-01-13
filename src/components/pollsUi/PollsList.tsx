@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
 import { viewPolls, deletePoll, flagPoll, isAdmin } from "@/lib/polls";
 import { Avatar } from "@/components/ui/avatar";
@@ -16,18 +15,13 @@ import {
   MenuTrigger,
 } from "@/components/ui/menu";
 import { EllipsisVertical } from "lucide-react";
-
-// Dynamically importing components to ensure they are only loaded on the client-side
-const DeletePollDialog = dynamic(() => import('@/components/layouts/DeletePollDialog'), { ssr: false });
-const FlagPollDialog = dynamic(() => import('@/components/layouts/FlagPollDialog'), { ssr: false });
-const EditPollDialog = dynamic(() => import('@/components/layouts/EditPollDialog'), { ssr: false });
-const Toolbar = dynamic(() => import('@/components/layouts/Toolbar'), { ssr: false });
-const FirstPollCTA = dynamic(() => import('@/components/layouts/FirstPollCTA'), { ssr: false });
-const Loading = dynamic(() => import('@/components/ui/Loading'), { ssr: false });
-
-
+import DeletePollDialog from "@/components/layouts/DeletePollDialog";
+import FlagPollDialog from "@/components/layouts/FlagPollDialog";
+import EditPollDialog from "@/components/layouts/EditPollDialog";
+import Toolbar from "@/components/layouts/Toolbar";
+import FirstPollCTA from "@/components/layouts/FirstPollCTA";
+import Loading from "@/components/ui/Loading";
 import { useAuth } from "@/contexts/AuthContext";
-
 
 interface Poll {
   id: string;
@@ -63,7 +57,7 @@ const PollsList: React.FC<PollsListProps> = ({ filterByCreator = false }) => {
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pollLoading, setPollLoading] = useState(true);
-  const [refreshFlag, setRefreshFlag] = useState(false);
+  const [refreshFlag, setRefreshFlag] = useState(false); // State to trigger refresh
 
   useEffect(() => {
     const fetchPolls = async () => {
