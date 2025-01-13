@@ -31,7 +31,7 @@ interface Poll {
   statement?: string;
   options: string[];
   startDate: string; // From API, assume it's a string
-  endDate: string;   // From API, assume it's a string
+  endDate: string; // From API, assume it's a string
   creatorId: string;
   createdAt: Date | string;
   status: string;
@@ -66,7 +66,7 @@ const PollDetails: React.FC = () => {
   // Fetch poll data
   const fetchPollDetails = useCallback(async () => {
     if (!slug || Array.isArray(slug)) return;
-  
+
     try {
       setLoading(true);
       const polls = await viewPolls({ slug });
@@ -74,7 +74,7 @@ const PollDetails: React.FC = () => {
         const normalizedPoll = {
           ...polls[0],
           startDate: formatDate(polls[0].startDate),
-          endDate: formatDate(polls[0].endDate), 
+          endDate: formatDate(polls[0].endDate),
         };
         setPoll(normalizedPoll);
       } else {
@@ -147,6 +147,11 @@ const PollDetails: React.FC = () => {
     }
   };
 
+  const calculatePercentage = (votes: number) => {
+    if (totalVotes === 0) return 0;
+    return (votes / totalVotes) * 100;
+  };
+
   const handleDelete = async (pollId: string) => {
     if (!user?.uid) return;
 
@@ -184,10 +189,9 @@ const PollDetails: React.FC = () => {
     title: poll.title,
     statement: poll.statement || "",
     options: poll.options,
-    startDate: new Date(poll.startDate),  // Convert to Date
-    endDate: new Date(poll.endDate),      // Convert to Date
+    startDate: new Date(poll.startDate), // Convert to Date
+    endDate: new Date(poll.endDate), // Convert to Date
   });
-  
 
   if (authLoading || loading) {
     return <Loading />;
@@ -253,56 +257,64 @@ const PollDetails: React.FC = () => {
       </div>
       <div className="border border-gray-500/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#0a0a0a] rounded-lg shadow p-5 hover:border-gray-500 dark:hover:border-gray-400 transition-all duration-200 ease-linear">
         <div className="flex flex-col gap-3">
-          <>
-            {poll.options.map((option) => (
-              <DialogRoot key={option}>
-                <DialogTrigger asChild>
-                  <Button
-                    onClick={() => setConfirmVote(option)}
-                    disabled={selectedOption !== null}
-                    className={`px-3 py-1 rounded-full cursor-pointer ${
-                      selectedOption === option
-                        ? "bg-blue-500 text-white border border-blue-700"
-                        : "bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent"
-                    } hover:bg-blue-500 hover:text-white transition-all duration-300 ease-in-out ${
-                      selectedOption !== null && selectedOption !== option
-                        ? "opacity-50 cursor-not-allowed" // Grayed-out style for unselected options
-                        : ""
-                    }`}
-                  >
-                    <span className="text-left w-full">
-                      {option} - {voteCounts[option] || 0} votes
-                    </span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Confirm Your Vote</DialogTitle>
-                  </DialogHeader>
-                  <DialogBody>
-                    <p>
-                      Are you sure you want to vote for &quot;{option}&quot;?
-                      This action cannot be undone.
-                    </p>
-                  </DialogBody>
-                  <DialogFooter>
-                    <DialogActionTrigger asChild>
-                      <Button
-                        onClick={() => {
-                          setConfirmVote(null);
-                        }}
-                        variant="outline"
-                      >
-                        Cancel
-                      </Button>
-                    </DialogActionTrigger>
-                    <Button onClick={handleVote}>Continue</Button>
-                  </DialogFooter>
-                  <DialogCloseTrigger />
-                </DialogContent>
-              </DialogRoot>
-            ))}
-          </>
+          {poll.options.map((option) => {
+            const votes = voteCounts[option] || 0;
+            const percentage = calculatePercentage(votes);
+            return (
+              <div key={option} className="flex flex-col gap-2">
+                <DialogRoot>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => setConfirmVote(option)}
+                      disabled={selectedOption !== null}
+                      className={`px-3 py-1 rounded-full cursor-pointer ${
+                        selectedOption === option
+                          ? "bg-blue-500 text-white border border-blue-700"
+                          : "bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent"
+                      } hover:bg-blue-500 hover:text-white transition-all duration-300 ease-in-out ${
+                        selectedOption !== null && selectedOption !== option
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      <span className="text-left w-full">{option}</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Confirm Your Vote</DialogTitle>
+                    </DialogHeader>
+                    <DialogBody>
+                      <p>
+                        Are you sure you want to vote for &quot;{option}&quot;?
+                      </p>
+                    </DialogBody>
+                    <DialogFooter>
+                      <DialogActionTrigger asChild>
+                        <Button
+                          onClick={() => {
+                            setConfirmVote(null);
+                          }}
+                          variant="outline"
+                        >
+                          Cancel
+                        </Button>
+                      </DialogActionTrigger>
+                      <Button onClick={handleVote}>Continue</Button>
+                    </DialogFooter>
+                    <DialogCloseTrigger />
+                  </DialogContent>
+                </DialogRoot>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {votes} votes - {percentage.toFixed(2)}%
+                </div>
+                <div
+                  className="h-2 rounded-full bg-gray-200 dark:bg-gray-700"
+                  style={{ width: `${percentage}%` }}
+                ></div>
+              </div>
+            );
+          })}
         </div>
         <div className="flex items-center gap-4 justify-between mb-2 mt-3 px-2">
           <div className="text-sm text-gray-700 dark:text-gray-300">
