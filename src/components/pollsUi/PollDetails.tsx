@@ -270,8 +270,8 @@ const PollDetails: React.FC = () => {
                       disabled={selectedOption !== null}
                       className={`relative overflow-hidden px-3 py-1 rounded-full cursor-pointer ${
                         selectedOption === option
-                          ? "bg-blue-500 text-white border border-blue-700"
-                          : "bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-transparent"
+                          ? "bg-blue-500 text-white border border-blue-700 font-semibold"
+                          : "bg-gray-200 dark:bg-gray-800 text-gray-800 font-semibold dark:text-gray-200 border-transparent"
                       } hover:bg-blue-500 hover:text-white transition-all duration-300 ease-in-out ${
                         selectedOption !== null && selectedOption !== option
                           ? "opacity-50 cursor-not-allowed"
@@ -280,7 +280,7 @@ const PollDetails: React.FC = () => {
                     >
                       {/* Progress bar inside the button */}
                       <div
-                        className="absolute inset-0 h-4/6 mx-1 my-auto rounded-full bg-blue-400 dark:bg-blue-700"
+                        className="absolute inset-0 h-4/6 mx-1 my-auto rounded-full bg-blue-400 dark:bg-blue-700 transition-all duration-300 ease-in-out"
                         style={{
                           width: `${percentage}%`,
                           zIndex: 0,
@@ -288,7 +288,12 @@ const PollDetails: React.FC = () => {
                       ></div>
 
                       {/* Text content of the button */}
-                      <span className="relative z-10 text-left w-full">
+                      <span
+                        className="relative z-10 text-left w-full transition-all duration-500 ease-in-out"
+                        style={{
+                          opacity: 1,
+                        }}
+                      >
                         {option} - {votes} votes ({percentage.toFixed(2)}%)
                       </span>
                     </Button>
