@@ -10,7 +10,18 @@ import { Avatar } from "@/components/ui/avatar";
 import { CheckCheck, RefreshCcw, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
-import PollMenu from "@/components/pollsUi/PollMenu";
+// import PollMenu from "@/components/pollsUi/PollMenu";
+import Link from "next/link";
+import { EllipsisVertical, View } from "lucide-react";
+import {
+  MenuContent,
+  MenuItem,
+  MenuRoot,
+  MenuTrigger,
+} from "@/components/ui/menu";
+import FlagPollDialog from "@/components/layouts/FlagPollDialog";
+import EditPollDialog from "@/components/layouts/EditPollDialog";
+import DeletePollDialog from "@/components/layouts/DeletePollDialog";
 import { Button } from "@chakra-ui/react";
 import {
   DialogRoot,
@@ -217,14 +228,55 @@ const PollDetails: React.FC = () => {
             {poll.creatorName || "Unknown Creator"}
           </span>
         </div>
-        <PollMenu
+        {/* <PollMenu
           isAdminUser={isAdminUser}
           canEditOrDelete={canEditOrDelete}
           poll={poll}
           onFlagToggle={handleFlagToggle}
           onDelete={handleDelete}
           mapPollToPollData={mapPollToPollData}
-        />
+        /> */}
+        {/* Poll Menu directly inside the details component */}
+        <MenuRoot>
+          <MenuTrigger asChild>
+            <div className="cursor-pointer">
+              <EllipsisVertical />
+            </div>
+          </MenuTrigger>
+          <MenuContent>
+            <MenuItem value="view">
+              <Link
+                href="/profile"
+                className="w-full h-5 flex justify-start items-center rounded-md border-gray-300 hover:border-gray-400 text-gray-700 dark:text-gray-200 gap-2"
+              >
+                <View className="size-4" />
+                <span>View Profile</span>
+              </Link>
+            </MenuItem>
+            {isAdminUser && (
+              <MenuItem value="flag">
+                <FlagPollDialog
+                  pollId={poll.id}
+                  flagged={poll.flagged}
+                  onFlagToggle={handleFlagToggle}
+                />
+              </MenuItem>
+            )}
+            {canEditOrDelete && (
+              <>
+                <MenuItem value="edit">
+                  <EditPollDialog
+                    pollId={poll.id}
+                    currentData={mapPollToPollData(poll)}
+                  />
+                </MenuItem>
+                <MenuItem value="delete">
+                  <DeletePollDialog pollId={poll.id} onDelete={handleDelete} />
+                </MenuItem>
+              </>
+            )}
+          </MenuContent>
+        </MenuRoot>
       </div>
       <div className="bg-gradient-to-r from-transparent via-gray-900 to-transparent dark:via-gray-500 h-[1px] w-full my-5 " />
       <div className="flex flex-col gap-3">
