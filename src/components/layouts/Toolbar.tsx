@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Input, Kbd } from "@chakra-ui/react";
+import { Button, Input} from "@chakra-ui/react";
 import { InputGroup } from "@/components/ui/input-group";
 import { Plus, RefreshCcw, Search } from "lucide-react";
 import {
@@ -40,7 +40,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSearchQuery, refreshComponent }) =
       <InputGroup
         flex="1"
         startElement={<Search size={15} />}
-        endElement={<Kbd>⌘K</Kbd>}
       >
         <Input
           placeholder="Search polls by title or statement"
